@@ -7,19 +7,22 @@ struct edge
 {
     int u, v, c;
 
+    /// @brief Constructors
     edge() {}
     edge(int a, int b) { u = a, v = b, c = 1; }
     edge(int a, int b, int x) { u = a, v = b, c = x; }
 
-    bool operator<(const edge &e) { return c < e.c; }
+    bool operator<(const edge &e) { return c < e.c; } // sort edges by weight ascendingly
 };
 
 // Union Find, Disjoint Sets Union, DSU
 struct UnionFind
 {
+    /// @brief Tree Variables
     int forests;
     vector<int> parent, size, rank;
 
+    /// @brief Constructors
     UnionFind(int n)
     {
         forests = n;
@@ -28,6 +31,9 @@ struct UnionFind
             parent[i] = i, size[i] = rank[i] = 1;
     }
 
+    /// @brief find the root of the tree containing v
+    /// @param v
+    /// @return the root of the tree containing v
     int find_set(int v)
     {
         if (v == parent[v])
@@ -35,6 +41,9 @@ struct UnionFind
         return parent[v] = find_set(parent[v]);
     }
 
+    /// @brief Union the tree contianing node a with the set containing node b
+    /// @param a
+    /// @param b
     void union_sets(int a, int b)
     {
         a = find_set(a);
@@ -51,8 +60,15 @@ struct UnionFind
         size[b] += size[a];
     }
 
+    /// @brief get the number of node of the tree containing node u
+    /// @param u
+    /// @return size of the tree containing node u
     int size_set(int u) { return size[find_set(u)]; }
 
+    /// @brief check if node u and node v are in the same tree or not
+    /// @param u
+    /// @param v
+    /// @return true if the two nodes are in the same tree, false otherwise
     bool same_set(int u, int v) { return find_set(u) == find_set(v); }
 };
 

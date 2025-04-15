@@ -10,9 +10,9 @@ struct ArticulationPointsAndBridges
     int n, m, cnt = 1, root, root_children;
     vector<int> id, low, parent, articulation;
 
-    ArticulationPointsAndBridges(int v, vector<vector<int>> &a)
+    ArticulationPointsAndBridges(vector<vector<int>> &a)
     {
-        adj = a, n = v, cnt = 1;
+        adj = a, n = a.size() - 1, cnt = 1;
         id = low = parent = articulation = vector<int>(n + 1, 0);
 
         for (int i = 1; i <= n; i++)
@@ -76,9 +76,9 @@ struct Tarjan
     vector<vector<int>> adj, scc;
     vector<int> id, low, visited;
 
-    Tarjan(int v, vector<vector<int>> &a)
+    Tarjan(vector<vector<int>> &a)
     {
-        n = v, adj = a;
+        n = a.size() - 1, adj = a;
         id = low = visited = vector<int>(n + 1, 0);
 
         for (int i = 1; i <= n; i++)
@@ -128,6 +128,27 @@ int32_t main()
 {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
+
+    int n, m;
+    cin >> n >> m;
+
+    vector<vector<int>> adj(n + 1);
+    for (int i = 1; i <= m; i++)
+    {
+        int u, v;
+        cin >> u >> v;
+
+        adj[u].push_back(v);
+    }
+
+    Tarjan ret(adj);
+    ArticulationPointsAndBridges ret2(adj);
+
+    vector<vector<int>> scc = ret.GetSCC();
+    vector<int> points = ret2.GetArticulationPoints();
+    vector<pair<int, int>> bridges = ret2.GetBridges();
+
+    // Do what you want on bridges, points, scc
 
     return 0;
 }

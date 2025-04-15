@@ -2,9 +2,11 @@
 
 using namespace std;
 
+#define int long long
 const int N = 1e6 + 20;
 int mod = 1e9 + 7;
 int fact[N], ifact[N];
+
 int add(int a, int b)
 {
     a += b;

@@ -168,5 +168,34 @@ int32_t main()
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
 
+    int n, m; // edges, nodes
+    cin >> n >> m;
+
+    vector<vector<int>> adj(2 * m + 1);
+    for (int i = 1; i <= n; i++)
+    {
+        char a, b;
+        int u, v, nu, nv; // u, v, !u, !v
+        cin >> a >> u >> b >> v;
+
+        nu = u + m, nv = v + m;
+        if (a == '-')
+            swap(u, nu);
+        if (b == '-')
+            swap(v, nv);
+
+        adj[nv].push_back(u); // edge from !v to u
+        adj[nu].push_back(v); // edges from !u to v
+    }
+
+    TwoSat ret(2 * m, adj);
+    vector<int> ans = ret.solve();
+
+    if (ans[1] == -1)
+        cout << "IMPOSSIBLE";
+    else
+        for (int i = 1; i <= m; i++)
+            cout << (ans[i] ? '+' : '-') << " ";
+
     return 0;
 }

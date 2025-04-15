@@ -17,9 +17,11 @@ struct UndirectedEulerCircuit
         edges = _edges;
         m = edges.size() - 1;
 
+        /// get number of nodes
         for (auto [u, v] : edges)
             n = max({n, u, v});
 
+        /// initialize the graph
         adj.resize(n + 1);
         vis = vector<int>(n + 1, 0);
         taken = vector<int>(m + 1, 0);
@@ -71,6 +73,7 @@ struct UndirectedEulerCircuit
         if (!ok)
             return vector<int>{-1};
 
+        /// if there is only two node with odd degree, add a virtual edge betwee these two nodes
         if (u1 != -1)
             m++, adj[u1].push_back({u2, m}), adj[u2].push_back({u1, m});
 
@@ -140,9 +143,6 @@ struct DirectedEulerCircuit
     {
         if (!ok)
             return vector<int>{-1};
-
-        if (u1 != -1)
-            m++, adj[u1].push_back({u2, m}), adj[u2].push_back({u1, m});
 
         taken = vector<int>(m + 1, 0);
         dfs(1);

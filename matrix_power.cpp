@@ -7,6 +7,10 @@ typedef vector<int> row;
 typedef vector<row> Matrix;
 vector<Matrix> powers(64);
 
+/// @brief Multiply two matrices a, and b
+/// @param a
+/// @param b
+/// @return result of multiplication
 Matrix multiply(Matrix &a, Matrix &b)
 {
     int n = a.size(), m = b[0].size();
@@ -25,12 +29,19 @@ Matrix multiply(Matrix &a, Matrix &b)
     }
     return ret;
 }
+
+/// @brief initialize all powers of a matrix
+/// @param ret
 void init(Matrix &ret)
 {
     powers[0] = ret;
     for (int i = 1; i < 64; i++)
         powers[i] = multiply(powers[i - 1], powers[i - 1]);
 }
+
+/// @brief raise a matrix to a power p
+/// @param p
+/// @return result of power
 Matrix get_power(int p)
 {
     int n = powers[0].size();

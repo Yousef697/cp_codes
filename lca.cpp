@@ -5,12 +5,15 @@ using namespace std;
 // Lowest Common Ancestor (LCA)
 struct LCA
 {
-    int lg = log2(2e5 + 5), cnt = 1;
+    /// @brief LCA Variable
+    int lg = log2(2e5 + 5), cnt = 1, n;
     vector<int> open, close, level;
     vector<vector<int>> table, adj;
 
-    LCA(int n, int root, vector<vector<int>> &a)
+    /// @brief Contructor
+    LCA(int root, vector<vector<int>> &a)
     {
+        n = a.size() - 1;
         lg = log2(n);
         open = close = level = vector<int>(n + 1, 0);
         table = vector<vector<int>>(n + 1, vector<int>(lg + 1, root));
@@ -19,6 +22,9 @@ struct LCA
         dfs(root, root);
     }
 
+    /// @brief do depth-first search on the tree to know if a node is an ancestor of another node
+    /// @param node
+    /// @param parent
     void dfs(int node, int parent)
     {
         open[node] = cnt++;
@@ -39,11 +45,19 @@ struct LCA
         close[node] = cnt++;
     }
 
+    /// @brief check if a node "a" is an ancestor of node "b"
+    /// @param a
+    /// @param b
+    /// @return true if node "a" is an ancestor of node "b", false otherwise
     bool isancestor(int a, int b)
     {
         return open[a] <= open[b] && close[b] <= close[a];
     }
 
+    /// @brief get the least common ancestor of two nodes
+    /// @param a
+    /// @param b
+    /// @return LCA
     int query(int a, int b)
     {
         if (isancestor(a, b))
@@ -62,6 +76,10 @@ struct LCA
         return table[a][0];
     }
 
+    /// @brief get the distance between two nodes in a tree
+    /// @param a
+    /// @param b
+    /// @return distance between node "a", and "b"
     int get_distance(int u, int v)
     {
         int ancestor = query(u, v);
@@ -77,6 +95,29 @@ int32_t main()
 {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
+
+    int n, q;
+    cin >> n >> q;
+
+    vector<vector<int>> adj(n + 1);
+    for (int i = 1; i <= n - 1; i++)
+    {
+        int u, v;
+        cin >> u >> v;
+
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    LCA lca(1, adj);
+
+    while (q--)
+    {
+        int u, v;
+        cin >> u >> v;
+
+        cout << lca.query(u, v) << "\n";
+    }
 
     return 0;
 }
