@@ -293,6 +293,38 @@ struct Trie
 
 // ==========================================================================================
 
+// Manacher
+vector<int> manacher(const string& s)
+{
+    string t = "";
+    for (const char& c : s)
+        t += '#', t += c;
+    t += '#';
+    int n = t.size();
+    t = '!' + t + '*';
+
+    int l = 0, r = 1;
+    vector<int> p(n + 2);
+    for (int i = 1; i <= n; i++)
+    {
+        p[i] = min(r - i, p[ l + (r - i) ]);
+        p[i] = max(0, p[i]);
+
+        while (t[i - p[i]] == t[i + p[i]])
+            p[i]++;
+
+        if (i + p[i] > r)
+            l = i - p[i], r = i + p[i];
+    }
+
+    for (int &i : p)
+        i--;
+
+    return vector<int>(p.begin() + 1, p.end() - 1);
+}
+
+// ==========================================================================================
+
 int32_t main()
 {
     ios::sync_with_stdio(false);
