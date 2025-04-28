@@ -238,30 +238,29 @@ struct Hash
 const int K = 26;
 struct Trie
 {
-    struct node
+    vector<int> leaf;
+    vector<vector<int>> tree;
+
+    Trie()
     {
-        int next[K];
-        bool leaf = 0;
-
-        node() { fill(begin(next), end(next), -1); }
-    };
-    vector<node> tree;
-
-    Trie() { tree.push_back(node()); }
+        leaf.push_back(0);
+        tree.push_back(vector<int>(26, 0));
+    }
 
     void add(const string& s)
     {
         int v = 0;
         for (const char& c : s)
         {
-            if (tree[v].next[c - 'a'] == -1)
+            if (tree[v][c - 'a'] == 0)
             {
-                tree[v].next[c - 'a'] = tree.size();
-                tree.push_back(node());
+                tree[v][c - 'a'] = tree.size();
+                tree.push_back(vector<int>(26, 0));
+                leaf.push_back(0);
             }
-            v = tree[v].next[c - 'a'];
+            v = tree[v][c - 'a'];
         }
-        tree[v].leaf = true;
+        leaf[v] = true;
     }
 
     int serach_word(const string& s)
@@ -269,12 +268,12 @@ struct Trie
         int v = 0;
         for (const char& c : s)
         {
-            if (tree[v].next[c - 'a'] == -1)
+            if (tree[v][c - 'a'] == 0)
                 return -1;
 
-            v = tree[v].next[c - 'a'];
+            v = tree[v][c - 'a'];
         }
-        return (tree[v].leaf == 1 ? 1 : -1);
+        return (leaf[v] == 1 ? 1 : -1);
     }
 
     int serach_prefix(const string& s)
@@ -282,12 +281,12 @@ struct Trie
         int v = 0;
         for (const char& c : s)
         {
-            if (tree[v].next[c - 'a'] == -1)
+            if (tree[v][c - 'a'] == 0)
                 return -1;
 
-            v = tree[v].next[c - 'a'];
+            v = tree[v][c - 'a'];
         }
-        return 1;
+        return v;
     }
 };
 
