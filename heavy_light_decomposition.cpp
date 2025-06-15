@@ -1,27 +1,3 @@
-/* sample tree
-20
-1 2
-1 3
-1 4
-2 5
-3 8
-3 9
-4 10
-5 6
-5 7
-10 11
-10 12
-10 13
-11 14
-12 15
-14 16
-14 17
-14 18
-7 19
-7 20
-
-*/
-
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -33,8 +9,8 @@ int32_t main() {
     int n;
     cin >> n;
 
-    vector<int> tree_parent(n + 1);
-    vector<vector<int>> adj(n + 1);
+    vector<int> tree_parent(n + 1); // parent of node i in the tree
+    vector<vector<int>> adj(n + 1); // adjacency list of each node
     for (int i = 1; i <= n - 1; i++) {
         int u, v;
         cin >> u >> v;
@@ -43,7 +19,7 @@ int32_t main() {
         adj[v].push_back(u);
     }
 
-    vector<int> dp_nodes(n + 1);
+    vector<int> dp_nodes(n + 1); // number of node in the subtree of node i
     function<void(int, int)> dfs_nodes = [&](int u, int p) {
 
         dp_nodes[u] = 1;
@@ -58,7 +34,7 @@ int32_t main() {
     };
     dfs_nodes(1, 0);
 
-    vector<int> leader(n + 1); leader[1] = 1;
+    vector<int> leader(n + 1); leader[1] = 1; // leader on the chain that contain node i
     function<void(int, int)> dfs_leader = [&](int u, int p) {
 
         int mx = 0, cnt = 0;
@@ -100,6 +76,7 @@ int32_t main() {
     };
     get_chains(1, 0, 1);
 
+    // printing the chains
     int j = 0;
     for (int i = 1; i <= n; i++) {
         if (chains[i].empty())
