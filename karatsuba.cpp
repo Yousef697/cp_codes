@@ -3,23 +3,25 @@
 
 using namespace std;
 
-vector<int> add(vector<int> a, vector<int> b) {
+vector<int> add(const vector<int>& a, const vector<int>& b) {
     int n = a.size();
+    vector<int> ret(n);
     for (int i = 0; i < n; i++)
-        a[i] += b[i];
-    return a;
+        ret[i] = a[i] + b[i];
+    return ret;
 }
 
-vector<int> subtract(vector<int> a, vector<int> b) {
+vector<int> subtract(const vector<int>& a, const vector<int>& b) {
     int n = a.size();
+    vector<int> ret(n);
     for (int i = 0; i < n; i++)
-        a[i] -= b[i];
-    return a;
+        ret[i] = a[i] - b[i];
+    return ret;
 }
 
 vector<int> karatsuba(const vector<int>& p, const vector<int>& q) {
     int n = p.size();
-    if (n <= 2) {
+    if (n <= 64) { // time limit? change this
         vector<int> ret(2 * n, 0);
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
@@ -73,7 +75,7 @@ int32_t main() {
     vector<int> a(n);
     for (auto& i : a)
         cin >> i;
-    
+
     cin >> m;
     vector<int> b(m);
     for (auto& j : b)
