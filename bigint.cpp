@@ -180,6 +180,27 @@ struct bigint {
         return *this;
     }
 };
+void print(const bigint& bi) {
+    if (bi.is_zero()) {
+        cout << 0;
+        return;
+    }
+    if (bi.sign == -1)
+        cout << '-';
+    for (int i = bi.size() - 1; i >= 0; i--)
+        cout << bi.digits[i];
+}
+void println(const bigint& bi) {
+    if (bi.is_zero()) {
+        cout << 0;
+        return;
+    }
+    if (bi.sign == -1)
+        cout << '-';
+    for (int i = bi.size() - 1; i >= 0; i--)
+        cout << bi.digits[i];
+    cout << "\n";
+}
 
 int32_t main() {
     ios::sync_with_stdio(false);
@@ -208,8 +229,7 @@ int32_t main() {
         bigint n(s);
         for (int i = 0; i < nums.size(); i++) {
             if (n < nums[i] || nums[i] == n) {
-                nums[i].print();
-                cout << "\n";
+                print(nums[i]);
                 break;
             }
         }
