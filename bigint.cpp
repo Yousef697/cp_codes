@@ -1,3 +1,4 @@
+// https://vjudge.net/problem/HDU-6222
 #include <bits/stdc++.h>
 
 using namespace std;
