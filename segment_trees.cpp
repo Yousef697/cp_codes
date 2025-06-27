@@ -2,6 +2,50 @@
 
 using namespace std;
 
+// Iterative Segment Tree
+template <typename T>
+struct SegmentTree {
+    int size;
+    vector<T> seg;
+
+    SegmentTree() {}
+
+    T merge(T a, T b) {
+        return max(a, b);
+    }
+
+    SegmentTree(const vector<T>& vec) {
+        int n = vec.size();
+        size = 1;
+        while (size < n) size <<= 1;
+        seg.assign(2 * size, 0);
+        for (int i = 0; i < n; ++i)
+            seg[i + size] = vec[i + 1];
+        for (int i = size - 1; i >= 1; --i)
+            seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
+    }
+
+    void update(int pos, T val) {
+        pos += size - 1;
+        seg[pos] = val;
+        for (pos >>= 1; pos; pos >>= 1)
+            seg[pos] = max(seg[2 * pos], seg[2 * pos + 1]);
+    }
+
+    T query(int l, int r) {
+        l += size - 1;
+        r += size - 1;
+        T res = 0;
+        while (l <= r) {
+            if (l & 1) res = max(res, seg[l++]);
+            if (!(r & 1)) res = max(res, seg[r--]);
+            l >>= 1;
+            r >>= 1;
+        }
+        return res;
+    }
+};
+
 // Segment Tree
 // For Min
 template <typename T>
