@@ -1,13 +1,14 @@
 #include <bits/stdc++.h>
 #include <complex>
 #include <cmath>
+#define int long long
+#define double long double
 
 using namespace std;
 
 const double eps = 1e-9;
 const double pi = acos(-1);
 const double rotation = 360.0;
-
 #define X real()
 #define Y imag()
 #define point complex<double>
@@ -30,18 +31,20 @@ const double rotation = 360.0;
 double to_radians(double degree) {
     return degree / 180.0 * pi;
 }
+
 double to_degree(double radian) {
     return radian / pi * 180.0;
 }
 
 int dcmp(double x, double y) {
-    if (fabs(x - y) < eps) return 0;
+    if (fabs(x - y) == 0) return 0;
     return (x < y ? -1 : 1);
 }
 
 bool is_collinear(point a, point b, point c) {
     return dcmp(cross(b - a, c - a), 0) == 0;
 }
+
 bool is_point_on_ray(point a, point b, point c) // is point c on ray ab
 {
     if (!is_collinear(a, b, c))
@@ -52,6 +55,7 @@ bool is_point_on_ray(point a, point b, point c) // is point c on ray ab
     //     return true;
     // return same(normalize(b - a), normalize(c - a));
 }
+
 bool is_point_on_segment(point a, point b, point c) // is point c on segment ab
 {
     return is_point_on_ray(a, b, c) && is_point_on_ray(b, a, c);
@@ -59,11 +63,13 @@ bool is_point_on_segment(point a, point b, point c) // is point c on segment ab
     // double ab = length(b - a), ac = length(c - a), bc = length(c - b);
     // return dcmp(ab, ac + bc) == 0;
 }
+
 double distance_to_line(point a, point b, point c) // distance between point c and line ab
 {
     double d = cross(a - c, b - c) / length(b - a);
     return fabs(d);
 }
+
 double distance_to_segment(point a, point b, point c) // distance between point c and segment ab
 {
     if (dcmp(dot(b - a, c - a), 0) == -1)
@@ -72,6 +78,7 @@ double distance_to_segment(point a, point b, point c) // distance between point 
         return length(c - b);
     return distance_to_line(a, b, c);
 }
+
 point lines_intersect(point a, point b, point c, point d) {
     double d1 = cross(a - b, d - c);
     double d2 = cross(a - c, d - c);
@@ -83,6 +90,7 @@ point lines_intersect(point a, point b, point c, point d) {
     double t1 = d2 / d1;
     return a + (b - a) * t1;
 }
+
 int counter_clockwise(point a, point b, point c) {
     point v1 = b - a, v2 = c - b, v3 = c - a;
 
@@ -98,6 +106,7 @@ int counter_clockwise(point a, point b, point c) {
         return 1;
     return -1;
 }
+
 bool are_segments_intersect(point a, point b, point c, point d) {
     // bool x = same(a, b), y = same(c, d);
     // if (x && y) return same(a, c);
@@ -111,25 +120,26 @@ bool are_segments_intersect(point a, point b, point c, point d) {
     return is_point_on_segment(a, b, intersect) && is_point_on_segment(c, d, intersect);
 }
 
-pair<double, point> circle(point a, point b, point c) {
+pair<double, point > circle(point a, point b, point c) {
     if (is_collinear(a, b, c))
         return {-1, point(0, 0)};
 
-    point m1 = (a + b) / 2.0, m2 = (a + c) / 2.0;
+    point m1 = (a + b) / (double) 2.0, m2 = (a + c) / (double) 2.0;
     point v1 = b - a, v2 = c - a;
     point p1(-v1.Y, v1.X), p2(-v2.Y, v2.X);
     point end1 = m1 + p1, end2 = m2 + p2;
     point center = lines_intersect(m1, end1, m2, end2);
     return {length(a - center), center};
 }
-vector<point> circle_line_intersection(double r, point c, point a, point b) // radius, center, line ab
+
+vector<point > circle_line_intersection(double r, point c, point a, point b) // radius, center, line ab
 {
     double A = dot(b - a, b - a);
     double B = 2 * dot(b - a, a - c);
     double C = dot(a - c, a - c) - r * r;
     double disc = B * B - 4 * A * C;
 
-    vector<point> res;
+    vector<point > res;
     if (dcmp(disc, 0) >= 0) {
         if (dcmp(disc, 0) == 0)
             disc = 0;
@@ -142,24 +152,25 @@ vector<point> circle_line_intersection(double r, point c, point a, point b) // r
     }
     return res;
 }
-vector<point> circle_circle_intersection(double r1, point c1, double r2, point c2) {
+
+vector<point > circle_circle_intersection(double r1, point c1, double r2, point c2) {
     // same circle with positive radius
     if (same(c1, c2) && dcmp(r1, r1) == 0 && dcmp(r1, 0) == 1)
-        return vector<point>(3, c1);
+        return vector<point >(3, c1);
 
     auto get_angle = [&](double a, double b, double c) {
-        return acos((b*b + c*c - a*a) / (2 * b * c));
+        return acos((b * b + c * c - a * a) / (2 * b * c));
     };
 
     double ang1 = angle(c2 - c1), ang2 = get_angle(r2, r1, length(c2 - c1));
     if (isnan(ang2))
         ang2 = 0;
 
-    vector<point> res;
+    vector<point > res;
     point p1 = c1 + polar(r1, ang1 + ang2);
 
     if (dcmp(dot(p1 - c1, p1 - c1), r1 * r1) != 0 || dcmp(dot(p1 - c2, p1 - c2), r2 * r2) != 0)
-        return vector<point>();
+        return vector<point >();
 
     res.push_back(p1);
     point p2 = c1 + polar(r1, ang1 - ang2);
@@ -167,6 +178,21 @@ vector<point> circle_circle_intersection(double r1, point c1, double r2, point c
         res.push_back(p2);
 
     return res;
+}
+
+
+bool cmp(point a, point b) {
+    double ang1 = to_degree(angle(a));
+    double ang2 = to_degree(angle(b));
+
+    if (dcmp(ang1, 0) == -1)
+        ang1 += rotation;
+    if (dcmp(ang2, 0) == -1)
+        ang2 += rotation;
+
+    if (dcmp(ang1, ang2) == 0)
+        return false;
+    return ang1 < ang2;
 }
 
 int32_t main() {
