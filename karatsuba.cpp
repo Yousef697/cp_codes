@@ -3,7 +3,7 @@
 
 using namespace std;
 
-vector<int> add(const vector<int>& a, const vector<int>& b) {
+vector<int> add(const vector<int> &a, const vector<int> &b) {
     int n = a.size();
     vector<int> ret(n);
     for (int i = 0; i < n; i++)
@@ -11,7 +11,7 @@ vector<int> add(const vector<int>& a, const vector<int>& b) {
     return ret;
 }
 
-vector<int> subtract(const vector<int>& a, const vector<int>& b) {
+vector<int> subtract(const vector<int> &a, const vector<int> &b) {
     int n = a.size();
     vector<int> ret(n);
     for (int i = 0; i < n; i++)
@@ -19,9 +19,9 @@ vector<int> subtract(const vector<int>& a, const vector<int>& b) {
     return ret;
 }
 
-vector<int> karatsuba(const vector<int>& p, const vector<int>& q) {
+vector<int> karatsuba(const vector<int> &p, const vector<int> &q) {
     int n = p.size();
-    if (n <= 64) { // time limit? change this
+    if (n <= 64) {
         vector<int> ret(2 * n, 0);
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
@@ -51,7 +51,6 @@ vector<int> karatsuba(const vector<int>& p, const vector<int>& q) {
 }
 
 vector<int> multiply(vector<int> p, vector<int> q) {
-
     int n = 1;
     while (n < max(p.size(), q.size()))
         n *= 2;
@@ -73,12 +72,12 @@ int32_t main() {
 
     cin >> n;
     vector<int> a(n);
-    for (auto& i : a)
+    for (auto &i: a)
         cin >> i;
 
     cin >> m;
     vector<int> b(m);
-    for (auto& j : b)
+    for (auto &j: b)
         cin >> j;
 
     vector<int> ret = multiply(a, b);

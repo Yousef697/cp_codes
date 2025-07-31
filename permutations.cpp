@@ -3,14 +3,12 @@
 using namespace std;
 
 // Permutation Cycles
-vector<vector<int>> cycles(vector<int> &perm)
-{
+vector<vector<int> > cycles(vector<int> &perm) {
     // 1-indexed
     int n = perm.size() - 1, d;
     vector<int> vis(n + 1);
-    vector<vector<int>> ret;
-    for (int i = 1; i <= n; i++)
-    {
+    vector<vector<int> > ret;
+    for (int i = 1; i <= n; i++) {
         if (vis[perm[i]])
             continue;
 
@@ -23,8 +21,7 @@ vector<vector<int>> cycles(vector<int> &perm)
     return ret;
 }
 
-int32_t main()
-{
+int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
 

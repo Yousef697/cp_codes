@@ -3,28 +3,32 @@
 using namespace std;
 
 // Edge
-struct edge
-{
+struct edge {
     int u, v, c;
 
     /// @brief Constructors
-    edge() {}
+    edge() { u = v = c = 0; }
     edge(int a, int b) { u = a, v = b, c = 1; }
     edge(int a, int b, int x) { u = a, v = b, c = x; }
 
-    bool operator<(const edge &e) { return c < e.c; } // sort edges by weight ascendingly
+    bool operator<(const edge &e) const { return c < e.c; } // sort edges by weight ascendingly
 };
 
 // Union Find, Disjoint Sets Union, DSU
-struct UnionFind
-{
+struct UnionFind {
     /// @brief Tree Variables
-    int forests;
+    int forests, N = 2e5;
     vector<int> parent, size, rank;
 
+    UnionFind() {
+        forests = N;
+        parent = size = rank = vector<int>(N + 1, 0);
+        for (int i = 0; i <= N; i++)
+            parent[i] = i, size[i] = rank[i] = 1;
+    }
+
     /// @brief Constructors
-    UnionFind(int n)
-    {
+    UnionFind(int n) {
         forests = n;
         parent = size = rank = vector<int>(n + 1, 0);
         for (int i = 0; i <= n; i++)
@@ -34,8 +38,7 @@ struct UnionFind
     /// @brief find the root of the tree containing v
     /// @param v
     /// @return the root of the tree containing v
-    int find_set(int v)
-    {
+    int find_set(int v) {
         if (v == parent[v])
             return v;
         return parent[v] = find_set(parent[v]);
@@ -44,8 +47,7 @@ struct UnionFind
     /// @brief Union the tree contianing node a with the set containing node b
     /// @param a
     /// @param b
-    void union_sets(int a, int b)
-    {
+    void union_sets(int a, int b) {
         a = find_set(a);
         b = find_set(b);
 
@@ -72,8 +74,7 @@ struct UnionFind
     bool same_set(int u, int v) { return find_set(u) == find_set(v); }
 };
 
-int32_t main()
-{
+int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
 

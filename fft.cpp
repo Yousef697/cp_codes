@@ -39,8 +39,8 @@ vector<point> ifft(vector<point> P_val) {
     vector<point> val_even(n / 2), val_odd(n / 2);
     for (int i = 0; i < n / 2; i++) {
         point wj(cos(2 * pi * i / n), sin(2 * pi * i / n));
-        val_even[i] = (long double)0.5 * (P_val[i] + P_val[i + n / 2]);
-        val_odd[i] = (long double)0.5 * (P_val[i] - P_val[i + n / 2]) / wj;
+        val_even[i] = (long double) 0.5 * (P_val[i] + P_val[i + n / 2]);
+        val_odd[i] = (long double) 0.5 * (P_val[i] - P_val[i + n / 2]) / wj;
     }
 
     vector<point> P_even = ifft(val_even);
