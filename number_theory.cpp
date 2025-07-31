@@ -12,8 +12,7 @@ const int N = 2e5 + 5, M = 1e2 + 2, K = 5e2 + 5;
 int dx[] = {0, 0, 1, -1, 1, 1, -1, -1};
 int dy[] = {1, -1, 0, 0, 1, -1, 1, -1};
 
-void fast()
-{
+void fast() {
 #ifndef ONLINE_JUDGE
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
@@ -77,8 +76,7 @@ void fast()
 */
 int division_mod(int a, int b) { return a - a / b * b; }
 int positive_mod(int a, int b) { return (a % b + b) % b; }
-int iterative_mod(int a, int b)
-{
+int iterative_mod(int a, int b) {
     while (a >= b)
         a -= b;
     while (a < 0)
@@ -87,7 +85,7 @@ int iterative_mod(int a, int b)
 }
 int add_mod(int a, int b, int mod) { return (a % mod + b % mod) % mod; }
 int last_digit(int a) { return a % 10; }
-int power_mod(int a, int b, int mod) { return (int)pow(a % mod, b) % mod; }
+int power_mod(int a, int b, int mod) { return (int) pow(a % mod, b) % mod; }
 int power_2_mod(int a, int mod) { return (a & (mod - 1)); }
 
 /// ========================================================================================================================================================================================================
@@ -98,7 +96,7 @@ int power_2_mod(int a, int mod) { return (a & (mod - 1)); }
                         --- Optimization 1: check if the number is 2 or its multiples
                                             then check odd numbers
                         --- Optimization 2: check numbers from 2:sqrt(n)
-                                            becuase if n = a * b the a <= sqrt(n), b >= sqrt(n)
+                                            becuase if n = a * b then a <= sqrt(n), b >= sqrt(n)
                         --- Optimization 3: calculate sqrt(n) before enterig the loop
 
     --- Prime Seive:    --- for each number i from 2 to n: if i was not marked, marke all multiples of i
@@ -123,28 +121,25 @@ int power_2_mod(int a, int mod) { return (a & (mod - 1)); }
     --- Number of diviors using Seive:  --- for number i, incearse number of divisors of all multiples if i by 1
 */
 vector<int> primes(N, 1);
-bool is_prime(int n)
-{
+
+bool is_prime(int n) {
     if (n <= 1)
         return false;
     if (n == 2 || n == 3)
         return true;
-    for (int i = 2; i * i <= n; i++)
-    {
+    for (int i = 2; i * i <= n; i++) {
         if (n % i == 0)
             return false;
     }
     return true;
 }
-void all_prime()
-{
+void all_prime() {
     // memset(all(primes), 1, sizeof primes);
     for (int i = 0; i < N; i++)
         primes[i] = 1;
 
     primes[0] = 0, primes[1] = 0;
-    for (int i = 2; i * i < N; i++)
-    {
+    for (int i = 2; i * i < N; i++) {
         if (!primes[i])
             continue;
 
@@ -152,8 +147,7 @@ void all_prime()
             primes[j] = 0;
     }
 }
-vector<int> divisors(int n)
-{
+vector<int> divisors(int n) {
     vector<int> ans;
     int i;
     for (i = 1; i * i < n; i++)
@@ -164,8 +158,7 @@ vector<int> divisors(int n)
         ans.push_back(i);
     return ans;
 }
-vector<int> prime_factorization(int n)
-{
+vector<int> prime_factorization(int n) {
     vector<int> ans;
     for (int i = 2; i * i <= n; i++)
         while (n % i == 0)
@@ -176,11 +169,9 @@ vector<int> prime_factorization(int n)
 
     return ans;
 }
-vector<pair<int, int>> prime_factorization_power_form(int n)
-{
-    vector<pair<int, int>> ans;
-    for (int i = 2; i * i <= n; i++)
-    {
+vector<pair<int, int> > prime_factorization_power_form(int n) {
+    vector<pair<int, int> > ans;
+    for (int i = 2; i * i <= n; i++) {
         int cnt = 0;
         while (n % i == 0)
             cnt++, n /= i;
@@ -215,8 +206,7 @@ vector<pair<int, int>> prime_factorization_power_form(int n)
     --- Given m, find smallest n such that n! has m trailing zeros
 */
 vector<int> fact(21);
-int factorial(int x)
-{
+int factorial(int x) {
     if (x == 0 || x == 1)
         return 1;
     int ans = 1;
@@ -224,35 +214,29 @@ int factorial(int x)
         ans *= i;
     return ans;
 }
-int recursive_factorial(int x)
-{
+int recursive_factorial(int x) {
     if (x == 0 || x == 1)
         return 1;
     return x * recursive_factorial(x - 1);
 }
-int number_of_digits_of_factorial_x(int x)
-{
+int number_of_digits_of_factorial_x(int x) {
     long double ans = 0;
 
     for (int i = 1; i <= x; i++)
         ans += log10(i);
-    return (int)ans + 1;
+    return (int) ans + 1;
 }
-int power_of_x_in_factorial_n(int x, int n)
-{
+int power_of_x_in_factorial_n(int x, int n) {
     int a = x, ans = 0;
 
     while (a <= n)
         ans += n / a, a *= x;
     return ans;
 }
-int number_of_trailing_zeros_in_factorial_n(int n)
-{
+int number_of_trailing_zeros_in_factorial_n(int n) {
     return power_of_x_in_factorial_n(5, n);
 }
-int right_most_non_zero_digit_in_factorial_n(int n)
-{
-
+int right_most_non_zero_digit_in_factorial_n(int n) {
     int ans = 1;
 
     int x = power_of_x_in_factorial_n(5, n);
@@ -261,8 +245,7 @@ int right_most_non_zero_digit_in_factorial_n(int n)
     while (y--)
         ans *= 2, ans %= 10;
 
-    for (int i = 3; i <= n; i++)
-    {
+    for (int i = 3; i <= n; i++) {
         if (i == 5)
             continue;
         if (!primes[i])
@@ -275,12 +258,12 @@ int right_most_non_zero_digit_in_factorial_n(int n)
     }
     return ans;
 }
-void all_fact()
-{
+void all_fact() {
     fact[0] = fact[1] = 1;
     for (int i = 2; i <= 10; i++)
         fact[i] = i * fact[i - 1];
 }
+
 /// ========================================================================================================================================================================================================
 
 /// === Chapter: Fibonacci, GCD, LCM, nPr, nCr, Fast Power, Geometric Series Sum, Stirling Numbers
@@ -322,8 +305,7 @@ void all_fact()
                                                     if k odd : ans(k) = a * (1 + ans(k-1))
                                                     if k = 0 : return 0
 */
-int fibonacci(int n)
-{
+int fibonacci(int n) {
     if (n <= 1)
         return n;
     int a = 0, b = 1, c;
@@ -331,33 +313,27 @@ int fibonacci(int n)
         c = a + b, a = b, b = c;
     return b;
 }
-int gcd(int a, int b)
-{
+int gcd(int a, int b) {
     int temp;
     while (b)
         temp = a, a = b, b = temp % a;
     return a;
 }
-int recursive_gcd(int a, int b)
-{
+int recursive_gcd(int a, int b) {
     if (b == 0)
         return a;
     return gcd(b, a % b);
 }
-int lcm(int a, int b)
-{
+int lcm(int a, int b) {
     return a / gcd(a, b) * b;
 }
-int permutaions(int n, int k)
-{
+int permutaions(int n, int k) {
     return factorial(n) / factorial(n - k);
 }
-int combinations(int n, int k)
-{
+int combinations(int n, int k) {
     return factorial(n) / (factorial(n - k) * factorial(k));
 }
-int fast_power(int n, int p)
-{
+int fast_power(int n, int p) {
     if (p == 0)
         return 1;
 
@@ -366,11 +342,9 @@ int fast_power(int n, int p)
 
     if (p % 2 == 0)
         return ans;
-    else
-        return ans * n;
+    return ans * n;
 }
-int fast_power_mod(int n, int p, int mod)
-{
+int fast_power_mod(int n, int p, int mod) {
     if (p == 0)
         return 1;
 
@@ -379,14 +353,11 @@ int fast_power_mod(int n, int p, int mod)
 
     if (p % 2 == 0)
         return ans % mod;
-    else
-        return (ans % mod * n % mod) % mod;
+    return (ans % mod * n % mod) % mod;
 }
-int geometric_series_sum(int a, int n)
-{
+int geometric_series_sum(int a, int n) {
     if (n == 0)
         return 0;
-
     if (n % 2 == 1)
         return a * (1 + geometric_series_sum(a, n - 1));
 
@@ -403,7 +374,7 @@ int geometric_series_sum(int a, int n)
     --- Extended GCD solve equations like: x*a + y*b = gcd(a, b) for x, y
 
     --- The code is like GCD code except for:
-        --- if b = 0, we can solve the eqaution by putting x=1, y=0 so: 1*a + 0*0 = a
+        --- if b = 0, we can solve the equation by putting x=1, y=0 so: 1*a + 0*0 = a
         --- so we now solved the equation for gcd(b, a%b) now we want to solve it for gcd(a, b)
         --- remember:   gcd(a, b) = x*a + y*b
                         gcd(b, a%b) = x1*b + y1*(a%b) = gcd(a, b) [a%b = a - floor(a/b) * b]
@@ -414,15 +385,12 @@ int geometric_series_sum(int a, int n)
         --- We can generate other solutions:
                     (xo, yo) = (x + k*b/gcd(a, b), y - k*a/gcd(a, b)) for all values of k
 */
-vector<int> extended_gcd(int a, int b)
-{
+vector<int> extended_gcd(int a, int b) {
     if (b == 0)
         return vector<int>{a, 1, 0};
 
     vector<int> v = extended_gcd(b, a % b);
-
     int x = v[2], y = v[1] - v[2] * a / b;
-
     return vector<int>{v[0], x, y};
     // Other solutions: (xo, yo) = (x + k*b/gcd(a, b), y - k*a/gcd(a, b)) for all values of k
 }
@@ -431,19 +399,15 @@ vector<int> extended_gcd(int a, int b)
 
 /// === Chapter: Linear Diophantine
 /*
-    --- Diophantine equations:  --- WHO CARES????
-                                --- Just jokking, use extended GCD to solve: a*x + b*y = c
+    --- Diophantine equations:  --- Use extended GCD to solve: a*x + b*y = c
                                 --- If c = gcd(a, b), the answer from the extended GCD is true
                                 --- else solve for c = gcd(a, b) then multiply by c / gcd(a, b)
                                 --- The algorithm work iff c % gcd(a, b) = 0
 */
-pair<int, int> linear_diophantine(int a, int b, int c)
-{
+pair<int, int> linear_diophantine(int a, int b, int c) {
     vector<int> ans = extended_gcd(a, b);
-
     if (c % ans[0] != 0)
         return {-1e9, -1e9};
-
     return {ans[1] * c / ans[0], ans[2] * c / ans[0]};
 }
 
@@ -466,7 +430,7 @@ pair<int, int> linear_diophantine(int a, int b, int c)
                         a = b (mod n) then a*c = b*c (mod n)
                     --- a*x = b (mod n) then x = b*a^-1
 
-    --- Large Powers:   --- assume that we want to calculte: a^m mod n
+    --- Large Powers:   --- assume that we want to calculate: a^m mod n
                         --- we want to reduce the large power
                         --- we want to find such k that a^k mod n = -1, 0, 1 (small values)
                         --- rewrite the equation: a^(q*k + r) mod n
@@ -475,19 +439,15 @@ pair<int, int> linear_diophantine(int a, int b, int c)
     --- Linear Modular Equation:    --- solve: a*x = b (mod m)
                                     --- rewrite the equation: a*x - b = y*m
                                     --- ax + y*m = b (mod m)
-                                    --- Note that: all possible solution ate between 0, m-1 (due to properties of modular arithmetic)
+                                    --- Note that: all possible solution are between 0, m-1 (due to properties of modular arithmetic)
 */
-vector<int> linear_modular_equation(int a, int b, int mod)
-{
-
+vector<int> linear_modular_equation(int a, int b, int mod) {
     vector<int> v = extended_gcd(a, mod), sols;
     int g = v[0], x = v[1];
-
     if (b % g != 0)
         return sols;
 
     x = ((x * b / g) % mod + mod) % mod; // In case of gcd(a, mod) != 1
-
     for (int i = 0; i < g; i++) // Bezout Identity
         sols.emplace_back((x + i * mod / g) % mod);
     sort(all(sols));
@@ -499,7 +459,7 @@ vector<int> linear_modular_equation(int a, int b, int mod)
 /// === Chapter: Euler Totient Function
 /*
     ---Euler Totient Function : --- Phi Function : counts the number of coprimes to n
-                                --- Comprimes : gcd(a, b) = 1
+                                --- Coprimes : gcd(a, b) = 1
                                 --- phi(a * b * c) = phi(a) * phi(b) * phi(c) iff a, b, c, are coprimes
                                 --- phi(p^k) = p^k - p^(k-1) = p^(k-1) * (p-1)
                                 --- phi(1) = phi(2) = 1
@@ -520,50 +480,42 @@ vector<int> linear_modular_equation(int a, int b, int mod)
                                                             --- multiply totient[j*i] by the answer
 */
 vector<int> phis(N);
-int phi_of_prime_power_k(int p, int k)
-{
+int phi_of_prime_power_k(int p, int k) {
     int ans = fast_power(p, k);
     return ans - ans / p;
 }
-int phi(int n)
-{
+int phi(int n) {
     if (n == 1 || n == 2)
         return 1;
 
-    vector<pair<int, int>> v = prime_factorization_power_form(n);
+    vector<pair<int, int> > v = prime_factorization_power_form(n);
     int ans = 1;
-    for (auto &[i, j] : v)
+    for (auto &[i, j]: v)
         ans *= phi_of_prime_power_k(i, j);
     return ans;
 }
-int phi_of_n_power_k(int n, int k)
-{
+int phi_of_n_power_k(int n, int k) {
     return fast_power(n, k - 1) * phi(n);
 }
-int phi_of_factorial_n(int n)
-{
+int phi_of_factorial_n(int n) {
     int ans = 1;
-    for (int i = 2; i <= n; i++)
-    {
+    for (int i = 2; i <= n; i++) {
         ans *= (primes[i] ? i - 1 : i);
     }
     return ans;
 }
-void all_phi()
-{
+void all_phi() {
     // memset(all(phis), 1);
     for (int i = 0; i < N; i++)
         phis[i] = 1;
 
-    for (int i = 2; i < N; i++)
-    {
+    for (int i = 2; i < N; i++) {
         if (!primes[i])
             continue;
 
         phis[i] = i - 1;
 
-        for (int j = 2 * i; j < N; j += i)
-        {
+        for (int j = 2 * i; j < N; j += i) {
             int cnt = 0, x = j;
             while (x % i == 0)
                 cnt++, x /= i;
@@ -621,32 +573,28 @@ void all_phi()
                                                     --- mobius[j] = (j % (i*i) == 0 ? 0 : -mobius[j])
 */
 vector<int> mobiuses(N);
-pair<bool, int> square_free(int n)
-{
-    vector<pair<int, int>> v = prime_factorization_power_form(n);
+pair<bool, int> square_free(int n) {
+    vector<pair<int, int> > v = prime_factorization_power_form(n);
 
     bool ok = 1;
-    for (auto &[i, j] : v)
+    for (auto &[i, j]: v)
         if (j > 1)
             ok = 0;
 
     return {ok, v.size()};
 }
-int mobius(int n)
-{
+int mobius(int n) {
     pair<bool, int> p = square_free(n);
     if (!p.first)
         return 0;
     return (p.second % 2 == 0 ? 1 : -1);
 }
-void all_mobius()
-{
+void all_mobius() {
     // memset(all(mobiuses), 1);
     for (int i = 0; i < N; i++)
         mobiuses[i] = 1;
 
-    for (int i = 2; i < N; i++)
-    {
+    for (int i = 2; i < N; i++) {
         if (!primes[i])
             continue;
 
@@ -680,7 +628,7 @@ void all_mobius()
                                                             --- 1/i = - (p/i) * 1/(p%i) (mod p)
                                                             --- inv[i] = - (p/i) * inv[p % i] (mod p)
                                                             --- inv[i] = p - (p/i) * inv[p % i] (mod p)
-                                                                [initailize all values of inv by 1]
+                                                                [initialize all values of inv by 1]
     --- Euler Theorem and LARGE Powers: --- remember:   a^phi(m) = 1 (mod m), a^(phi(m)-1) = 1/a (mod m) [gcd(a, m) = 1]
                                                         a^(p-1) = 1 (mod p), a^(p-2) = 1/a (mod p) [p is prime]
                                         --- a^b = a^(n*phi(m) + k)  = a^(n*phi(m)) * a^k (mod m)
@@ -696,29 +644,23 @@ void all_mobius()
                                                                     = a^[p-1 - * b%(p-1)] mod p
 */
 vector<int> invs(N);
-int mod_inv(int a, int n)
-{
+int mod_inv(int a, int n) {
     vector<int> v = extended_gcd(a, n);
-
     return v[1];
 }
-int mod_inv_euler(int a, int n)
-{
+int mod_inv_euler(int a, int n) {
     return fast_power_mod(a, phi(n) - 1, n);
 }
-int mod_inv_prime(int a, int n)
-{
+int mod_inv_prime(int a, int n) {
     return fast_power_mod(a, n - 2, n);
 }
-void all_mod_inv(int p)
-{
+void all_mod_inv(int p) {
     for (int i = 0; i < N; i++)
         invs[i] = 1;
     for (int i = 2; i < N; i++)
         invs[i] = p - p / i * invs[p % i], invs[i] = (invs[i] % p + p) % p;
 }
-int euler_theorem_for_large_powers(int a, int b, int mod)
-{
+int euler_theorem_for_large_powers(int a, int b, int mod) {
     return fast_power_mod(a, b % phi(mod), mod);
 }
 
@@ -726,13 +668,13 @@ int euler_theorem_for_large_powers(int a, int b, int mod)
 
 /// === Chapter: Modular Arithmetic Applications
 /*
-    --- Factoial mod p after removing all p in the factorial:
+    --- Factorial mod p after removing all p in the factorial:
                     --- Assume we want to calculate 33! % 5 after removing all p in the factorial
                     --- 1 * 2 * 3 * 4 * 5 * 6 * 7 * 8 * 9 * 10 * 11 * ...
                         1 * 2 * 3 * 4 * 1 * 6 * 7 * 8 * 9 *  2 * 11 * ...
                         So the problem will be
                     ---  1  2  3  4  1 ( 5)
-                            6  7  8  9  2 (10)
+                         6  7  8  9  2 (10)
                         11 12 13 14  3 (15)
                         16 17 18 19  4 (20)
                         21 22 23 24  5 (25)
@@ -769,11 +711,9 @@ int euler_theorem_for_large_powers(int a, int b, int mod)
     --- Catalan Numbers:    --- Cn = (2n choose n) / (n+1) = (2n)! / (n! * (n+1)!) = (2n choose n) - (2n choose (n+1))
                             --- It is all about combinations and factorials, we can solve it using the above algorithms
 */
-int factorial_mod_p(int n, int p)
-{
+int factorial_mod_p(int n, int p) {
     int res = 1;
-    while (n)
-    {
+    while (n) {
         for (int i = 1; i <= n % p; i++)
             res = (res * i) % p;
         n /= p;
@@ -782,8 +722,7 @@ int factorial_mod_p(int n, int p)
     }
     return res;
 }
-int combinations_mod_p(int n, int k, int p)
-{
+int combinations_mod_p(int n, int k, int p) {
     int a = power_of_x_in_factorial_n(p, n);
     int b = power_of_x_in_factorial_n(p, k);
     int c = power_of_x_in_factorial_n(p, n - k);
@@ -797,10 +736,8 @@ int combinations_mod_p(int n, int k, int p)
 
     return (up * down_inv) % p;
 }
-int combinations_mod_p_locus(int n, int k, int p)
-{
-    auto to_base_p = [&](int x, int p)
-    {
+int combinations_mod_p_locus(int n, int k, int p) {
+    auto to_base_p = [&](int x, int p) {
         vector<int> num;
         while (x)
             num.emplace_back(x % p), x /= p;
@@ -811,8 +748,7 @@ int combinations_mod_p_locus(int n, int k, int p)
     while (kp.size() < np.size())
         kp.emplace_back(0);
     int res = 1;
-    for (int i = 0; i < np.size(); i++)
-    {
+    for (int i = 0; i < np.size(); i++) {
         for (int j = 0; j < k; j++)
             (res *= n - j) %= p;
 
@@ -823,11 +759,10 @@ int combinations_mod_p_locus(int n, int k, int p)
     }
     return res;
 }
-int catalan(int n, int p)
-{
+int catalan(int n, int p) {
     int a = combinations_mod_p(2 * n, n, p);
     int b = combinations_mod_p(2 * n, n + 1, p);
-    return (a - n + p) % p;
+    return (a - b + p) % p;
 }
 
 /// ========================================================================================================================================================================================================
@@ -842,7 +777,7 @@ int catalan(int n, int p)
     --- Brute Force? Bad. Lets get into the theorem
     --- To solve the system, there are some conditions must holds:  --- n1, n1, ..., nk must be pairwise coprime
                                                                     --- ai = aj (mod gcd(ni, nj)) for all i, j
-                                                                    --- x are then congreunt to lcm(n1, n2, ..., nk)
+                                                                    --- x are then congruent to lcm(n1, n2, ..., nk)
     --- if a, b, c are pairwise coprime, then gcd(a, b) = gcd(b, c) = gcd(a, c) = 1, and lcm(a, b, c) = a * b * c
     --- To covert a%n to b%n, just make it as (a/a * b)%n = (a * a^-1 * b)%n
     --- Now the system is: a[i] and mods[i] and b[i] and c[i] and answer=0
@@ -856,7 +791,7 @@ int catalan(int n, int p)
     --- if we have two equations, can we solve it? lets try
     --- Follow my leads:    --- The equations are: x = a1 mod n1, x = a2 mod n2
                             --- x = b1*n1 + a1 = b2*n2 + a2
-                            --- n1*b1 + n2*(-b2)x = a2-a1 (wiat, Diophantine? YES!!);
+                            --- n1*b1 + n2*(-b2)x = a2-a1 (wait, Diophantine? YES!!);
                             --- new rem: rem + mod*x, new mod: lcm(mod, mods[i]), rem %= mod
 
     --- There is another way to solve if mods are not pairwise coprime
@@ -878,25 +813,20 @@ int catalan(int n, int p)
     --- Calculate f() % pi and then using crt we can get the value of f()
 
 */
-int crt_coprime_mods(vector<int> &rems, vector<int> &mods)
-{
+int crt_coprime_mods(vector<int> &rems, vector<int> &mods) {
     int product = 1, ans = 0;
-    for (auto &i : mods)
+    for (auto &i: mods)
         product *= i;
-
-    for (int i = 0; i < rems.size(); i++)
-    {
+    for (int i = 0; i < rems.size(); i++) {
         int sub = product / mods[i];
         ans += sub * mod_inv_euler(sub, mods[i]) * rems[i];
     }
     return ans % product;
 }
-int general_crt(vector<int> &rems, vector<int> &mods)
-{
+int general_crt(vector<int> &rems, vector<int> &mods) {
     int rem = rems[0], mod = mods[0];
 
-    for (int i = 1; i < rems.size(); i++)
-    {
+    for (int i = 1; i < rems.size(); i++) {
         int a = mod, b = -mods[i], c = rems[i] - rem;
         auto [x, y] = linear_diophantine(a, b, c);
 
@@ -909,7 +839,8 @@ int general_crt(vector<int> &rems, vector<int> &mods)
     }
     return rem;
 }
-int composite_mod(int a, int mod) {}
+int composite_mod(int a, int mod) {
+}
 
 /// ========================================================================================================================================================================================================
 
@@ -952,7 +883,7 @@ int composite_mod(int a, int mod) {}
                                     n := n mod i!
                                 return perm
 
-    --- Index of permutaion:    --- let perm a the permutation of length m
+    --- Index of permutation:    --- let perm a the permutation of length m
                                     let idx=0
                                     for all number i from 0 to m-1
                                         idx += (n-1-i)! * prem[i]
@@ -960,7 +891,7 @@ int composite_mod(int a, int mod) {}
                                             if perm[j] > perm[i], prem[j] := perm[j] - 1
                                     return idx
 
-    --- Permutation Multiplication(Mapping):    --- mapping a permutaion a = [a1, a2, .., ak] to a permutaion b = [b1, b2, .., bk]
+    --- Permutation Multiplication(Mapping):    --- mapping a permutation a = [a1, a2, .., ak] to a permutation b = [b1, b2, .., bk]
                                                     means let a = [a[b1], a[b2], .., a[bk]] and is denoted by a*b
                                                 --- It is associative, and not commutative
                                                     a*b*c = (a*b)*c = a*(b*c)
@@ -974,7 +905,7 @@ int composite_mod(int a, int mod) {}
                                 ex: 2 0 1 4 3
                                     0 -> 2
                                     2 -> 1
-                                    1 -> 0 (Odd Cylce)
+                                    1 -> 0 (Odd Cycle)
 
                                     3 -> 4
                                     4 -> 3 (Even Cycle)
@@ -990,20 +921,16 @@ int composite_mod(int a, int mod) {}
     --- Permutaion Order:   --- Remember: Each cycle with length ni repeats itself every ni times
                             --- So, if you have x cycles with length n1, n2, .., nx, the permutation will repeat itself
                                 every lcm(n1, n2, .., nx) times
-    --- Stirleng Numbers:   Again? WHO CARES???? OK, we will back to him
+    --- Stirleng Numbers:   OK, we will back to him
     --- The video will discuss some problems, please listen to them
 */
 
-/// ========================================================================================================================================================================================================
-
-vector<int> nth_permutation(int len, int idx)
-{
+vector<int> nth_permutation(int len, int idx) {
     vector<int> identity(len), ans(len, 0);
     for (int i = 0; i < len; i++)
         identity[i] = i;
 
-    for (int i = 0; i < len; i++)
-    {
+    for (int i = 0; i < len; i++) {
         int p = idx / fact[len - 1 - i];
         ans[i] = identity[p];
         identity.erase(identity.begin() + p);
@@ -1011,20 +938,17 @@ vector<int> nth_permutation(int len, int idx)
     }
     return ans;
 }
-int permutation_index(vector<int> perm)
-{
+int permutation_index(vector<int> perm) {
     int n = perm.size(), ans = 0;
 
-    for (int i = 0; i < perm.size(); i++)
-    {
+    for (int i = 0; i < perm.size(); i++) {
         ans += fact[n - 1 - i] * perm[i];
         for (int j = i + 1; j < n; j++)
             perm[j] -= (perm[j] > perm[i]);
     }
     return ans;
 }
-vector<int> map_permutation(vector<int> perm, vector<int> mapping)
-{
+vector<int> map_permutation(vector<int> perm, vector<int> mapping) {
     int n = perm.size();
     vector<int> ans(n);
 
@@ -1032,21 +956,18 @@ vector<int> map_permutation(vector<int> perm, vector<int> mapping)
         ans[i] = perm[mapping[i]];
     return ans;
 }
-vector<vector<int>> get_permutation_cycles(vector<int> perm)
-{
+vector<vector<int> > get_permutation_cycles(vector<int> perm) {
     int n = perm.size();
     vector<int> vis(n, 0);
-    vector<vector<int>> ans;
+    vector<vector<int> > ans;
 
-    for (int i = 0; i < n; i++)
-    {
+    for (int i = 0; i < n; i++) {
         if (vis[i])
             continue;
 
         int d = perm[i];
         vector<int> temp;
-        while (!vis[d])
-        {
+        while (!vis[d]) {
             temp.emplace_back(d);
             vis[d] = 1, d = perm[d];
         }
@@ -1055,18 +976,16 @@ vector<vector<int>> get_permutation_cycles(vector<int> perm)
     }
     return ans;
 }
-int permutation_order(vector<int> perm)
-{
+int permutation_order(vector<int> perm) {
     int ans = 1;
-    vector<vector<int>> x = get_permutation_cycles(perm);
+    vector<vector<int> > x = get_permutation_cycles(perm);
 
-    for (auto v : x)
+    for (auto v: x)
         ans = lcm(ans, v.size());
     return ans;
 }
 
-int32_t main()
-{
+int32_t main() {
     fast();
     all_prime();
     all_fact();
