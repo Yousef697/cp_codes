@@ -1,44 +1,51 @@
 #include <bits/stdc++.h>
+#define int long long
 
 using namespace std;
 
 // Iterative Segment Tree
-template <typename T>
-struct SegmentTree {
-    int size;
-    vector<T> seg;
+struct Segment_Tree {
+    using T = int;
 
-    SegmentTree() {}
+    int size, neutral;
+    vector<int> seg;
 
-    T merge(T a, T b) {
-        return max(a, b);
+    int merge(int a, int b) { return max(a, b); }
+
+    Segment_Tree() {
     }
 
-    SegmentTree(const vector<T>& vec) {
-        int n = vec.size();
-        size = 1;
+    Segment_Tree(int n) {
+        size = 1, neutral = 0;
         while (size < n) size <<= 1;
-        seg.assign(2 * size, 0);
+        seg.assign(2 * size + 2, 0);
+    }
+
+    Segment_Tree(const vector<int> &vec) {
+        int n = vec.size();
+        size = 1, neutral = 0;
+        while (size < n) size <<= 1;
+        seg.assign(2 * size + 2, 0);
         for (int i = 0; i < n; ++i)
             seg[i + size] = vec[i + 1];
         for (int i = size - 1; i >= 1; --i)
             seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
 
-    void update(int pos, T val) {
+    void update(int pos, int val) {
         pos += size - 1;
-        seg[pos] = val;
+        seg[pos] = merge(seg[pos], val);
         for (pos >>= 1; pos; pos >>= 1)
-            seg[pos] = max(seg[2 * pos], seg[2 * pos + 1]);
+            seg[pos] = merge(seg[2 * pos], seg[2 * pos + 1]);
     }
 
-    T query(int l, int r) {
+    int query(int l, int r) {
         l += size - 1;
         r += size - 1;
-        T res = 0;
+        int res = 0;
         while (l <= r) {
-            if (l & 1) res = max(res, seg[l++]);
-            if (!(r & 1)) res = max(res, seg[r--]);
+            if (l & 1) res = merge(res, seg[l++]);
+            if (!(r & 1)) res = merge(res, seg[r--]);
             l >>= 1;
             r >>= 1;
         }
@@ -46,662 +53,241 @@ struct SegmentTree {
     }
 };
 
-// Segment Tree
-// For Min
-template <typename T>
-struct SegmentTree
-{
-    int size;
-    vector<T> v, seg;
+// Recursive Segment Tree
+struct SegmentTree {
+    using T = int;
 
-    SegmentTree() {}
+    int n, neutral;
+    vector<T> seg;
 
-    SegmentTree(vector<T> vec)
-    {
-        v = vec;
-        size = 1;
-        int n = vec.size() - 1;
-        while (size < n)
-            size *= 2;
-        seg.assign(2 * size + 2, 0);
-        build();
+    T merge(T a, T b) { return min(a, b); }
+
+    SegmentTree() {
     }
 
-    T merge(T a, T b)
-    {
-        return min(a, b);
+    SegmentTree(int _n) {
+        n = _n, neutral = 0;
+        seg.assign(4 * n + 5, neutral);
     }
 
-    void build(int n, int l, int r)
-    {
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = v[l];
+    SegmentTree(const vector<T> &vec) {
+        n = (int) vec.size() - 1, neutral = 0;
+        seg.assign(4 * n + 5, neutral);
+        build(1, 1, n, vec);
+    }
+
+    void build(int i, int l, int r, const vector<T> &vec) {
+        if (l == r) {
+            seg[i] = vec[l];
             return;
         }
 
-        build(2 * n, l, (l + r) / 2);
-        build(2 * n + 1, (l + r) / 2 + 1, r);
-
-        seg[n] = merge(seg[2 * n], seg[2 * n + 1]);
+        build(2 * i, l, (l + r) / 2, vec);
+        build(2 * i + 1, (l + r) / 2 + 1, r, vec);
+        seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
 
-    void update(int n, int l, int r, int ind, int val)
-    {
+    void update(int i, int l, int r, int ind, int val) {
         if (ind < l || ind > r)
             return;
 
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = val, v[l] = val;
+        if (l == r) {
+            seg[i] = val;
             return;
         }
 
-        update(2 * n, l, (l + r) / 2, ind, val);
-        update(2 * n + 1, (l + r) / 2 + 1, r, ind, val);
+        update(2 * i, l, (l + r) / 2, ind, val);
+        update(2 * i + 1, (l + r) / 2 + 1, r, ind, val);
 
-        seg[n] = merge(seg[2 * n], seg[2 * n + 1]);
+        seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
 
-    T query(int n, int l, int r, int lq, int rq)
-    {
+    T query(int i, int l, int r, int lq, int rq) {
         if (r < lq || l > rq)
-            return INT_MAX;
+            return neutral;
 
         if (lq <= l && r <= rq)
-            return seg[n];
+            return seg[i];
 
-        T a = query(2 * n, l, (l + r) / 2, lq, rq);
-        T b = query(2 * n + 1, (l + r) / 2 + 1, r, lq, rq);
+        T a = query(2 * i, l, (l + r) / 2, lq, rq);
+        T b = query(2 * i + 1, (l + r) / 2 + 1, r, lq, rq);
 
         return merge(a, b);
     }
-
-    void build() { build(1, 1, size); }
-
-    void update(int ind, int val) { update(1, 1, size, ind, val); }
-
-    T query(int l, int r) { return query(1, 1, size, l, r); }
-};
-
-// For Max
-template <typename T>
-struct SegmentTree
-{
-    int size;
-    vector<T> v, seg;
-
-    SegmentTree() {}
-
-    SegmentTree(vector<T> vec)
-    {
-        v = vec;
-        size = 1;
-        int n = vec.size() - 1;
-        while (size < n)
-            size *= 2;
-        seg.assign(2 * size + 2, 0);
-        build();
-    }
-
-    T merge(T a, T b)
-    {
-        return max(a, b);
-    }
-
-    void build(int n, int l, int r)
-    {
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = v[l];
-            return;
-        }
-
-        build(2 * n, l, (l + r) / 2);
-        build(2 * n + 1, (l + r) / 2 + 1, r);
-
-        seg[n] = merge(seg[2 * n], seg[2 * n + 1]);
-    }
-
-    void update(int n, int l, int r, int ind, int val)
-    {
-        if (ind < l || ind > r)
-            return;
-
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = val, v[l] = val;
-            return;
-        }
-
-        update(2 * n, l, (l + r) / 2, ind, val);
-        update(2 * n + 1, (l + r) / 2 + 1, r, ind, val);
-
-        seg[n] = merge(seg[2 * n], seg[2 * n + 1]);
-    }
-
-    T query(int n, int l, int r, int lq, int rq)
-    {
-        if (r < lq || l > rq)
-            return -1;
-
-        if (lq <= l && r <= rq)
-            return seg[n];
-
-        T a = query(2 * n, l, (l + r) / 2, lq, rq);
-        T b = query(2 * n + 1, (l + r) / 2 + 1, r, lq, rq);
-
-        return merge(a, b);
-    }
-
-    void build() { build(1, 1, size); }
-
-    void update(int ind, int val) { update(1, 1, size, ind, val); }
-
-    T query(int l, int r) { return query(1, 1, size, l, r); }
-};
-
-// For Sum
-template <typename T>
-struct SegmentTree
-{
-    int size;
-    vector<T> v, seg;
-
-    SegmentTree() {}
-
-    SegmentTree(vector<T> vec)
-    {
-        v = vec;
-        size = 1;
-        int n = vec.size() - 1;
-        while (size < n)
-            size *= 2;
-        seg.assign(2 * size + 2, 0);
-        build();
-    }
-
-    T merge(T a, T b)
-    {
-        return a + b;
-    }
-
-    void build(int n, int l, int r)
-    {
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = v[l];
-            return;
-        }
-
-        build(2 * n, l, (l + r) / 2);
-        build(2 * n + 1, (l + r) / 2 + 1, r);
-
-        seg[n] = merge(seg[2 * n], seg[2 * n + 1]);
-    }
-
-    void update(int n, int l, int r, int ind, int val)
-    {
-        if (ind < l || ind > r)
-            return;
-
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = val, v[l] = val;
-            return;
-        }
-
-        update(2 * n, l, (l + r) / 2, ind, val);
-        update(2 * n + 1, (l + r) / 2 + 1, r, ind, val);
-
-        seg[n] = merge(seg[2 * n], seg[2 * n + 1]);
-    }
-
-    T query(int n, int l, int r, int lq, int rq)
-    {
-        if (r < lq || l > rq)
-            return 0;
-
-        if (lq <= l && r <= rq)
-            return seg[n];
-
-        T a = query(2 * n, l, (l + r) / 2, lq, rq);
-        T b = query(2 * n + 1, (l + r) / 2 + 1, r, lq, rq);
-
-        return merge(a, b);
-    }
-
-    void build() { build(1, 1, size); }
-
-    void update(int ind, int val) { update(1, 1, size, ind, val); }
-
-    T query(int l, int r) { return query(1, 1, size, l, r); }
-};
-
-// MinMax Segment Tree
-template <typename T>
-struct SegmentTree
-{
-    int size;
-    vector<T> v, seg_min, seg_max;
-
-    SegmentTree() {}
-
-    SegmentTree(vector<T> vec)
-    {
-        v = vec;
-        size = 1;
-        int n = vec.size() - 1;
-        while (size < n)
-            size *= 2;
-        seg_min.assign(2 * size + 2, 2e9);
-        seg_max.assign(2 * size + 2, -2e9);
-
-        build();
-    }
-
-    T merge_min(T a, T b) { return min(a, b); }
-    T merge_max(T a, T b) { return max(a, b); }
-
-    void build(int n, int l, int r)
-    {
-        if (l == r)
-        {
-            if (l < v.size())
-                seg_min[n] = seg_max[n] = v[l];
-            return;
-        }
-
-        build(2 * n, l, (l + r) / 2);
-        build(2 * n + 1, (l + r) / 2 + 1, r);
-
-        seg_min[n] = merge_min(seg_min[2 * n], seg_min[2 * n + 1]);
-        seg_max[n] = merge_max(seg_max[2 * n], seg_max[2 * n + 1]);
-    }
-
-    void update(int n, int l, int r, int ind, int val)
-    {
-        if (ind < l || ind > r)
-            return;
-
-        if (l == r)
-        {
-            if (l < v.size())
-                seg_min[n] = seg_max[n] = v[l];
-            return;
-        }
-
-        update(2 * n, l, (l + r) / 2, ind, val);
-        update(2 * n + 1, (l + r) / 2 + 1, r, ind, val);
-
-        seg_min[n] = merge_min(seg_min[2 * n], seg_min[2 * n + 1]);
-        seg_max[n] = merge_max(seg_max[2 * n], seg_max[2 * n + 1]);
-    }
-
-    T query_min(int n, int l, int r, int lq, int rq)
-    {
-        if (r < lq || l > rq)
-            return 2e9;
-
-        if (lq <= l && r <= rq)
-            return seg_min[n];
-
-        T a = query_min(2 * n, l, (l + r) / 2, lq, rq);
-        T b = query_min(2 * n + 1, (l + r) / 2 + 1, r, lq, rq);
-
-        return merge_min(a, b);
-    }
-
-    T query_max(int n, int l, int r, int lq, int rq)
-    {
-        if (r < lq || l > rq)
-            return -2e9;
-
-        if (lq <= l && r <= rq)
-            return seg_max[n];
-
-        T a = query_max(2 * n, l, (l + r) / 2, lq, rq);
-        T b = query_max(2 * n + 1, (l + r) / 2 + 1, r, lq, rq);
-
-        return merge_max(a, b);
-    }
-
-    void build() { build(1, 1, size); }
-
-    void update(int ind, int val) { update(1, 1, size, ind, val); }
-
-    T query_min(int l, int r) { return query_min(1, 1, size, l, r); }
-
-    T query_max(int l, int r) { return query_max(1, 1, size, l, r); }
 };
 
 // ==========================================================================================
 
 // Lazy Propagation, Lazy Segment Tree
-// Lazy For Min
-struct LazySegmentTree
-{
-    int size;
-    vector<long long> v, seg, lazy;
+struct LazySegmentTree {
+    int n, neutral;
+    vector<int> seg, lazy;
 
-    LazySegmentTree(vector<long long> vec)
-    {
-        v = vec;
-        size = 1;
-        int n = vec.size() - 1;
-        while (size < n)
-            size *= 2;
-        seg.assign(2 * size + 2, 0);
-        lazy.assign(2 * size + 2, 0);
+    LazySegmentTree() {}
+    LazySegmentTree(int _n) {
+        n = _n, neutral = 0;
+        seg = lazy = vector<int>(4 * n + 5, neutral);
+    }
+    LazySegmentTree(const vector<int> &vec) {
+        n = vec.size() - 1, neutral = 0;
+        seg = lazy = vector<int>(4 * size + 2, neutral);
+        build(1, 1, n, vec);
     }
 
-    void process(int n, int l, int r)
-    {
-        if (lazy[n] == 0)
+    int merge(int a, int b) { return max(a, b); }
+    void process(int i, int l, int r) {
+        if (lazy[i] == 0)
             return;
 
-        seg[n] += lazy[n];
+        seg[n] += lazy[i];
         if (l != r)
-            lazy[2 * n] += lazy[n], lazy[2 * n + 1] += lazy[n];
-        lazy[n] = 0;
+            lazy[2 * i] += lazy[i], lazy[2 * i + 1] += lazy[i];
+        lazy[i] = 0;
     }
+    void build(int i, int l, int r, const vector<int> &vec) {
+        process(i, l, r);
 
-    void build(int n, int l, int r)
-    {
-        process(n, l, r);
-
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = v[l];
+        if (l == r) {
+            seg[i] = vec[l];
             return;
         }
 
-        build(2 * n, l, (l + r) / 2);
-        build(2 * n + 1, (l + r) / 2 + 1, r);
-
-        seg[n] = min(seg[2 * n], seg[2 * n + 1]);
+        build(2 * i, l, (l + r) / 2, vec);
+        build(2 * i + 1, (l + r) / 2 + 1, r, vec);
+        seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
-
-    void update_range(int n, int l, int r, int lq, int rq, int x)
-    {
-        process(n, l, r);
+    void update(int i, int l, int r, int lq, int rq, int x) {
+        process(i, l, r);
 
         if (r < lq || rq < l)
             return;
 
-        if (lq <= l && r <= rq)
-        {
-            seg[n] += x;
-            if (l != r)
-                lazy[2 * n] += x, lazy[2 * n + 1] += x;
+        if (lq <= l && r <= rq) {
+            lazy[i] += x;
+            process(i, l, r);
             return;
         }
 
-        update_range(2 * n, l, (l + r) / 2, lq, rq, x);
-        update_range(2 * n + 1, (l + r) / 2 + 1, r, lq, rq, x);
+        update(2 * i, l, (l + r) / 2, lq, rq, x);
+        update(2 * i + 1, (l + r) / 2 + 1, r, lq, rq, x);
 
-        seg[n] = min(seg[2 * n], seg[2 * n + 1]);
+        seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
-
-    long long query(int n, int l, int r, int lq, int rq)
-    {
-        process(n, l, r);
+    int query(int i, int l, int r, int lq, int rq) {
+        process(i, l, r);
 
         if (r < lq || l > rq)
-            return LLONG_MAX;
+            return neutral;
 
         if (lq <= l && r <= rq)
-            return seg[n];
+            return seg[i];
 
-        int a = query(2 * n, l, (l + r) / 2, lq, rq);
-        int b = query(2 * n + 1, (l + r) / 2 + 1, r, lq, rq);
+        int a = query(2 * i, l, (l + r) / 2, lq, rq);
+        int b = query(2 * i + 1, (l + r) / 2 + 1, r, lq, rq);
 
-        return min(a, b);
+        return merge(a, b);
     }
-
-    void build() { build(1, 1, size); }
-
-    void update_range(int l, int r, int x) { update_range(1, 1, size, l, r, x); }
-
-    long long query(int l, int r) { return query(1, 1, size, l, r); }
-};
-
-// Lazy For Sum
-struct LazySegmentTree
-{
-    int size;
-    vector<long long> v, seg, lazy;
-
-    LazySegmentTree(vector<long long> vec)
-    {
-        v = vec;
-        size = 1;
-        int n = vec.size() - 1;
-        while (size < n)
-            size *= 2;
-        seg.assign(2 * size + 2, 0);
-        lazy.assign(2 * size + 2, 0);
-    }
-
-    void process(int n, int l, int r)
-    {
-        if (lazy[n] == 0)
-            return;
-
-        seg[n] += lazy[n] * (r - l + 1);
-        if (l != r)
-            lazy[2 * n] += lazy[n], lazy[2 * n + 1] += lazy[n];
-        lazy[n] = 0;
-    }
-
-    void build(int n, int l, int r)
-    {
-        process(n, l, r);
-
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = v[l];
-            return;
-        }
-
-        build(2 * n, l, (l + r) / 2);
-        build(2 * n + 1, (l + r) / 2 + 1, r);
-
-        seg[n] = seg[2 * n] + seg[2 * n + 1];
-    }
-
-    void update_range(int n, int l, int r, int lq, int rq, long long x)
-    {
-        process(n, l, r);
-
-        if (r < lq || rq < l)
-            return;
-
-        if (lq <= l && r <= rq)
-        {
-            seg[n] += x * (r - l + 1);
-            if (l != r)
-                lazy[2 * n] += x, lazy[2 * n + 1] += x;
-            return;
-        }
-
-        update_range(2 * n, l, (l + r) / 2, lq, rq, x);
-        update_range(2 * n + 1, (l + r) / 2 + 1, r, lq, rq, x);
-
-        seg[n] = seg[2 * n] + seg[2 * n + 1];
-    }
-
-    long long query(int n, int l, int r, int lq, int rq)
-    {
-        process(n, l, r);
-
-        if (r < lq || l > rq)
-            return 0;
-
-        if (lq <= l && r <= rq)
-            return seg[n];
-
-        long long a = query(2 * n, l, (l + r) / 2, lq, rq);
-        long long b = query(2 * n + 1, (l + r) / 2 + 1, r, lq, rq);
-
-        return a + b;
-    }
-
-    void build() { build(1, 1, size); }
-
-    void update_range(int l, int r, long long x) { update_range(1, 1, size, l, r, x); }
-
-    long long query(int l, int r) { return query(1, 1, size, l, r); }
 };
 
 // ==========================================================================================
 
 // Maximum Sum Range Query
-struct node
-{
-    long long prefix, middle, suffix, sum;
+struct node {
+    int prefix, middle, suffix, sum;
 
-    node(long long a, long long b, long long c, long long d)
-    {
-        prefix = a, middle = b, suffix = c, sum = d;
-    }
+    node() { prefix = middle = suffix = sum = 0; }
+    node(int a, int b, int c, int d) { prefix = a, middle = b, suffix = c, sum = d; }
 };
-struct MaximumSum
-{
-    int size = 1;
+struct MaximumSum {
+    int n, INF = 1e18;
     vector<node> seg;
 
-    MaximumSum(int n)
-    {
-        while (size < n)
-            size *= 2;
-        seg.assign(2 * size + 4, node(0, 0, 0, 0));
+    MaximumSum() {}
+    MaximumSum(int _n) {
+        n = _n;
+        seg = vector<node> (4 * n + 5, node());
     }
 
-    node merge(int n, node a, node b)
-    {
-        if (a.prefix == -OO)
+    node merge(node a, node b) {
+        if (a.prefix == -INF)
             return b;
-        if (b.prefix == -OO)
+        if (b.prefix == -INF)
             return a;
 
         node ans(0, 0, 0, 0);
-
         ans.prefix = max({a.prefix, a.sum + b.prefix, a.sum + b.sum});
-
         ans.middle = max({a.middle, b.middle, a.suffix + b.prefix, a.sum + b.sum});
-
         ans.suffix = max({b.suffix, b.sum + a.suffix, a.sum + b.sum});
-
         ans.sum = a.sum + b.sum;
 
         return ans;
     }
-    void build(vector<long long> &v, int n, int l, int r)
-    {
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = node(v[l], v[l], v[l], v[l]);
+
+    void build(int i, int l, int r, const vector<int>& vec) {
+        if (l == r) {
+            seg[i] = node(vec[l], vec[l], vec[l], vec[l]);
             return;
         }
 
-        build(v, 2 * n, l, (l + r) / 2);
-        build(v, 2 * n + 1, (l + r) / 2 + 1, r);
-
-        seg[n] = merge(n, seg[2 * n], seg[2 * n + 1]);
+        build(2 * i, l, (l + r) / 2, vec);
+        build(2 * i + 1, (l + r) / 2 + 1, r, vec);
+        seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
-    void update(int n, int l, int r, int ind, long long val)
-    {
+    void update(int i, int l, int r, int ind, int val) {
         if (ind < l || ind > r)
             return;
 
-        if (l == r)
-        {
-            seg[n].prefix = val;
-            seg[n].middle = val;
-            seg[n].suffix = val;
-            seg[n].sum = val;
+        if (l == r) {
+            seg[i] = node(val, val, val, val);
             return;
         }
 
-        update(2 * n, l, (l + r) / 2, ind, val);
-        update(2 * n + 1, (l + r) / 2 + 1, r, ind, val);
+        update(2 * i, l, (l + r) / 2, ind, val);
+        update(2 * i + 1, (l + r) / 2 + 1, r, ind, val);
 
-        seg[n] = merge(n, seg[2 * n], seg[2 * n + 1]);
+        seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
-    node query(int n, int l, int r, int lq, int rq)
-    {
+    node query(int i, int l, int r, int lq, int rq) {
         if (l > rq || lq > r)
-            return node(-OO, -OO, -OO, -OO);
+            return node(-INF, -INF, -INF, -INF);
 
         if (lq <= l && r <= rq)
-            return seg[n];
+            return seg[i];
 
-        node a = query(2 * n, l, (l + r) / 2, lq, rq);
-        node b = query(2 * n + 1, (l + r) / 2 + 1, r, lq, rq);
+        node a = query(2 * i, l, (l + r) / 2, lq, rq);
+        node b = query(2 * i + 1, (l + r) / 2 + 1, r, lq, rq);
 
-        return merge(n, a, b);
-    }
-
-    void build(vector<long long> &v) { build(v, 1, 1, size); }
-
-    void update(int i, long long val) { update(1, 1, size, i, val); }
-
-    long long query(int l, int r)
-    {
-        node ans = query(1, 1, size, l, r);
-        return max({ans.prefix, ans.middle, ans.suffix});
+        return merge(a, b);
     }
 };
 
 // ==========================================================================================
 
 // Maximum Alternating Subsequence Sum
-struct node
-{
-    long long max_pp; // max of start with + and end with +
-    long long max_pn; // max of start with + and end with -
+struct Node {
+    int max_pp; // max of start with + and end with +
+    int max_pn; // max of start with + and end with -
+    int min_pp; // min of start with + and end with +
+    int min_pn; // min of start with + and end with -
 
-    long long min_pp; // min of start with + and end with +
-    long long min_pn; // min of start with + and end with -
-
-    node(long long a, long long b)
-    {
-        max_pp = a;
-        min_pp = a;
-
-        max_pn = b;
-        min_pn = b;
+    Node() {}
+    Node(int a, int b) {
+        max_pp = a, min_pp = a;
+        max_pn = b, min_pn = b;
     }
 };
-struct MaximumAlternatingSubsequenceSum
-{
-    int size = 1;
-    vector<long long> v;
-    vector<node> seg;
+struct MaximumAlternatingSubsequenceSum {
+    int n;
+    vector<Node> seg;
 
-    MaximumAlternatingSubsequenceSum(vector<long long> &vec)
-    {
-        v = vec;
+    MaximumAlternatingSubsequenceSum(const vector<int> &vec) {
         int n = vec.size() - 1;
-        while (size < n)
-            size *= 2;
-        seg.assign(2 * size + 4, node(0, 0));
-        build();
+        seg = vector<Node>(4 * n + 5, Node(0, 0));
+        build(1, 1, n, vec);
     }
 
-    node merge(node a, node b)
-    {
-        node ans(0, 0);
+    Node merge(Node a, Node b) {
+        Node ans(0, 0);
 
         ans.max_pp = max({a.max_pp, b.max_pp, a.max_pp - b.min_pn, a.max_pn + b.max_pp});
         ans.max_pn = max({a.max_pn, b.max_pn, a.max_pn + b.max_pn, a.max_pp - b.min_pp});
@@ -712,168 +298,113 @@ struct MaximumAlternatingSubsequenceSum
         return ans;
     }
 
-    void build(int n, int l, int r)
-    {
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = node(v[l], 0);
+    void build(int i, int l, int r, const vector<int>& vec) {
+        if (l == r) {
+            seg[i] = Node(vec[l], 0);
             return;
         }
 
-        build(2 * n, l, (l + r) / 2);
-        build(2 * n + 1, (l + r) / 2 + 1, r);
-
-        seg[n] = merge(seg[2 * n], seg[2 * n + 1]);
+        build(2 * i, l, (l + r) / 2, vec);
+        build(2 * i + 1, (l + r) / 2 + 1, r, vec);
+        seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
-
-    void update(int n, int l, int r, int ind, long long val)
-    {
+    void update(int i, int l, int r, int ind, int val) {
         if (ind < l || ind > r)
             return;
 
-        if (l == r)
-        {
-            v[ind] = val;
-            seg[n] = node(val, 0);
-
+        if (l == r) {
+            seg[i] = Node(val, 0);
             return;
         }
 
-        update(2 * n, l, (l + r) / 2, ind, val);
-        update(2 * n + 1, (l + r) / 2 + 1, r, ind, val);
+        update(2 * i, l, (l + r) / 2, ind, val);
+        update(2 * i + 1, (l + r) / 2 + 1, r, ind, val);
 
-        seg[n] = merge(seg[2 * n], seg[2 * n + 1]);
+        seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
-
-    node query(int n, int l, int r, int lq, int rq)
-    {
+    Node query(int i, int l, int r, int lq, int rq) {
         if (l > rq || lq > r)
-            return node(0, 0);
+            return Node(0, 0);
 
         if (lq <= l && r <= rq)
-            return seg[n];
+            return seg[i];
 
-        node a = query(2 * n, l, (l + r) / 2, lq, rq);
-        node b = query(2 * n + 1, (l + r) / 2 + 1, r, lq, rq);
+        Node a = query(2 * i, l, (l + r) / 2, lq, rq);
+        Node b = query(2 * i + 1, (l + r) / 2 + 1, r, lq, rq);
 
         return merge(a, b);
-    }
-
-    void build() { build(1, 1, size); }
-
-    void update(int i, long long val) { update(1, 1, size, i, val); }
-
-    long long query(int l, int r)
-    {
-        node ans = query(1, 1, size, l, r);
-        return max({ans.max_pp, ans.max_pn});
     }
 };
 
 // ==========================================================================================
 
 // Merge Sort Tree
-struct MergeSortTree
-{
-    int size;
-    vector<int> v;
-    vector<vector<int>> seg;
+struct MergeSortTree {
+    int n;
+    vector<vector<int> > seg;
 
-    MergeSortTree() {}
-
-    MergeSortTree(vector<int> &vec)
-    {
-        v = vec;
-        size = 1;
-        int n = vec.size() - 1;
-        while (size < n)
-            size *= 2;
-        seg.assign(2 * size + 2, vector<int>{});
-
-        build();
+    MergeSortTree() {
+    }
+    MergeSortTree(vector<int> &vec) {
+        n = vec.size() - 1;
+        seg = vector<vector<int>>(4 * n + 2, vector<int>{});
+        build(1, 1, n, vec);
     }
 
-    vector<int> merge(vector<int> &a, vector<int> &b)
-    {
+    vector<int> merge(vector<int> &a, vector<int> &b) {
         vector<int> ans;
         int x = a.size(), y = b.size(), i = 0, j = 0;
-
-        while (i < x && j < y)
-        {
+        while (i < x && j < y) {
             if (a[i] < b[j])
                 ans.emplace_back(a[i++]);
             else
                 ans.emplace_back(b[j++]);
         }
-
         while (i < x)
             ans.emplace_back(a[i++]);
-
         while (j < y)
             ans.emplace_back(b[j++]);
-
         return ans;
     }
 
-    void build(int n, int l, int r)
-    {
-        if (l == r)
-        {
-            if (l < v.size())
-                seg[n] = vector<int>{v[l]};
+    void build(int i, int l, int r, const vector<int>& vec) {
+        if (l == r) {
+            seg[i] = vector<int>{vec[l]};
             return;
         }
 
-        build(2 * n, l, (l + r) / 2);
-        build(2 * n + 1, (l + r) / 2 + 1, r);
-
-        seg[n] = merge(seg[2 * n], seg[2 * n + 1]);
+        build(2 * i, l, (l + r) / 2, vec);
+        build(2 * i + 1, (l + r) / 2 + 1, r, vec);
+        seg[i] = merge(seg[2 * i], seg[2 * i + 1]);
     }
-
-    int greater(int n, int l, int r, int lq, int rq, int val)
-    {
+    int greater(int i, int l, int r, int lq, int rq, int val) {
         if (r < lq || l > rq)
             return 0;
 
-        if (lq <= l && r <= rq)
-        {
-            int ind = upper_bound(seg[n].begin(), seg[n].end(), val) - seg[n].begin();
-            return seg[n].size() - ind;
+        if (lq <= l && r <= rq) {
+            int ind = upper_bound(seg[i].begin(), seg[i].end(), val) - seg[i].begin();
+            return seg[i].size() - ind;
         }
 
-        int a = greater(2 * n, l, (l + r) / 2, lq, rq, val);
-        int b = greater(2 * n + 1, (l + r) / 2 + 1, r, lq, rq, val);
+        int a = greater(2 * i, l, (l + r) / 2, lq, rq, val);
+        int b = greater(2 * i + 1, (l + r) / 2 + 1, r, lq, rq, val);
 
         return (a + b);
     }
-
-    int less(int n, int l, int r, int lq, int rq, int val)
-    {
+    int less(int i, int l, int r, int lq, int rq, int val) {
         if (r < lq || l > rq)
             return 0;
-
-        if (lq <= l && r <= rq)
-        {
-            int ind = lower_bound(seg[n].begin(), seg[n].end(), val) - seg[n].begin() - 1;
-            return ind + 1;
+        if (lq <= l && r <= rq) {
+            int ind = lower_bound(seg[i].begin(), seg[i].end(), val) - seg[i].begin();
+            return ind;
         }
-
-        int a = less(2 * n, l, (l + r) / 2, lq, rq, val);
-        int b = less(2 * n + 1, (l + r) / 2 + 1, r, lq, rq, val);
-
+        int a = less(2 * i, l, (l + r) / 2, lq, rq, val);
+        int b = less(2 * i + 1, (l + r) / 2 + 1, r, lq, rq, val);
         return (a + b);
     }
-
-    void build() { build(1, 1, size); }
-
-    int less(int l, int r, int val) { return less(1, 1, size, l, r, val); }
-
-    int greater(int l, int r, int val) { return greater(1, 1, size, l, r, val); }
 };
 
-int32_t main()
-{
+int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
 
