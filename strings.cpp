@@ -31,6 +31,22 @@ vector<int> compute_prefixes(const string& pat) {
 
     return prefixes;
 }
+vector<vector<int>> compute_automation(string s) {
+    s += '#';
+    int n = s.size();
+    auto pi = compute_prefixes(s);
+    vector<vector<int>> automation(n, vector<int>(26, 0));
+
+    for (int i = 0; i < n; i++) {
+        for (int ch = 0; ch < 26; ch++) {
+            if (i > 0 && 'a' + ch != s[i])
+                automation[i][ch] = automation[pi[i - 1]][ch];
+            else
+                automation[i][ch] = i + ('a' + ch == s[i]);
+        }
+    }
+    return automation;
+}
 int KMP(const string& s, const string& pat) {
 
     int n = s.size(), m = pat.size(), ans = 0;
