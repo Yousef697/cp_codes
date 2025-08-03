@@ -63,16 +63,17 @@ void fast() {
         a % n = b % n  =>  (a - b) % n = 0
         largest n such that a % n = b % n  =>  n = b - a
 
-    --- Some Facts: --- (a % n) % n = a % n
-                    --- (n ^ x) % n = 0 [x > 0, x is integer]
-                    --- -a % n != a % n
-                    --- (a + b) % n = (a%n + b%n) % n
-                    --- x % (a + b) != x%a + x%b
-                    --- x%10: last digit, floor(x/10): removes last digit
-                    --- (a ^ b) % n = ( (a % n) ^ b ) % n
-                    --- (1 / a) % n  =>  Mod multiplicative inverse
-                    --- ( (a*b)%n * (1/a)%n ) % n = b % n
-                    --- a % (2 ^ n) = a & (2^n-1)
+    --- Some Facts:
+        --- (a % n) % n = a % n
+        --- (n ^ x) % n = 0 [x > 0, x is integer]
+        --- -a % n != a % n
+        --- (a + b) % n = (a%n + b%n) % n
+        --- x % (a + b) != x%a + x%b
+        --- x%10: last digit, floor(x/10): removes last digit
+        --- (a ^ b) % n = ( (a % n) ^ b ) % n
+        --- (1 / a) % n  =>  Mod multiplicative inverse
+        --- ( (a*b)%n * (1/a)%n ) % n = b % n
+        --- a % (2 ^ n) = a & (2^n-1)
 */
 int division_mod(int a, int b) { return a - a / b * b; }
 int positive_mod(int a, int b) { return (a % b + b) % b; }
@@ -92,33 +93,40 @@ int power_2_mod(int a, int mod) { return (a & (mod - 1)); }
 
 /// === Chpater: Primes, Divisors, Factorization
 /*
-    --- Prime Checking: --- Main Logic: Check all numbers from 2:n-1
-                        --- Optimization 1: check if the number is 2 or its multiples
-                                            then check odd numbers
-                        --- Optimization 2: check numbers from 2:sqrt(n)
-                                            becuase if n = a * b then a <= sqrt(n), b >= sqrt(n)
-                        --- Optimization 3: calculate sqrt(n) before enterig the loop
+    --- Prime Checking:
+        --- Main Logic: Check all numbers from 2:n-1
+        --- Optimization 1: check if the number is 2 or its multiples
+                            then check odd numbers
+        --- Optimization 2: check numbers from 2:sqrt(n)
+                            becuase if n = a * b then a <= sqrt(n), b >= sqrt(n)
+        --- Optimization 3: calculate sqrt(n) before enterig the loop
 
-    --- Prime Seive:    --- for each number i from 2 to n: if i was not marked, marke all multiples of i
+    --- Prime Seive:
+        --- for each number i from 2 to n: if i was not marked, marke all multiples of i
 
     --- Factorization:  Getting all divisors of a number
 
-    --- Generating Divisors:    --- loop on numbers i from 1 to sqrt(n)
-                                --- if n mod i = 0, add i and n / i to the prime factors
-                                --- after the loop check if n has an integer square root or not
+    --- Generating Divisors:
+        --- loop on numbers i from 1 to sqrt(n)
+        --- if n mod i = 0, add i and n / i to the prime factors
+        --- after the loop check if n has an integer square root or not
 
-    --- Prime Factorization:    --- loop on numbers i from 1 to sqrt(n)
-                                --- while n mod i = 0, add i to the divisors and then divide n by i
-                                --- after the loop check if n is not 1, add n to the prime factors
+    --- Prime Factorization:
+        --- loop on numbers i from 1 to sqrt(n)
+        --- while n mod i = 0, add i to the divisors and then divide n by i
+        --- after the loop check if n is not 1, add n to the prime factors
 
-    --- Number of Divisors: --- assume n = p1^a1 * p2^a1 * ... * pk^ak
-                            --- number of divisors is (a1 + 1) * (a2 + 1) * ... * (ak + 1)
+    --- Number of Divisors:
+        --- assume n = p1^a1 * p2^a1 * ... * pk^ak
+        --- number of divisors is (a1 + 1) * (a2 + 1) * ... * (ak + 1)
 
-    --- Number of divisors of n^z:  --- assume n = p1^a1 * p2^a1 * ... * pk^ak
-                                    --- n^z = p1^(a1*z) * p2^(a1*z) * ... * pk^(ak*z)
-                                    --- number of divisors is (a1*z + 1) * (a2*z + 1) * ... * (ak*z + 1)
+    --- Number of divisors of n^z:
+        --- assume n = p1^a1 * p2^a1 * ... * pk^ak
+        --- n^z = p1^(a1*z) * p2^(a1*z) * ... * pk^(ak*z)
+        --- number of divisors is (a1*z + 1) * (a2*z + 1) * ... * (ak*z + 1)
 
-    --- Number of diviors using Seive:  --- for number i, incearse number of divisors of all multiples if i by 1
+    --- Number of diviors using Seive:
+        --- for number i, incearse number of divisors of all multiples if i by 1
 */
 vector<int> primes(N, 1);
 
@@ -195,13 +203,15 @@ vector<pair<int, int> > prime_factorization_power_form(int n) {
 
     --- To get power of x inside n!: let m = n!, while m%x=0: (m /= x, number_of_powers++)
 
-    --- Some facts: --- 0! = 1! = 1
-                    --- n! % x = 0 for 1 <= x <= n
-                    --- (p-1)! % p = p-1 iff p is prime (Wilson's Theorem)
-                    --- Number of digits of n! = 1 + floor( sum of log_10(i) ) for 1 <= i <= n;
-                    --- Number of trailing zeros: number of power of 5 inside n!
-                    --- Right most non-zero digit is:   --- (n! / 10^number of trailing zeros)%10
-                                                        --- or delete 10's from the prime factorization of n!
+    --- Some facts:
+        --- 0! = 1! = 1
+        --- n! % x = 0 for 1 <= x <= n
+        --- (p-1)! % p = p-1 iff p is prime (Wilson's Theorem)
+        --- Number of digits of n! = 1 + floor( sum of log_10(i) ) for 1 <= i <= n;
+        --- Number of trailing zeros: number of power of 5 inside n!
+        --- Right most non-zero digit is:
+            --- (n! / 10^number of trailing zeros)%10
+            --- or delete 10's from the prime factorization of n!
 
     --- Given m, find smallest n such that n! has m trailing zeros
 */
@@ -268,42 +278,50 @@ void all_fact() {
 
 /// === Chapter: Fibonacci, GCD, LCM, nPr, nCr, Fast Power, Geometric Series Sum, Stirling Numbers
 /*
-    --- Fibonacci:  --- Each number is the sum of the two previous numbers
-                    --- The base cases: fib(0) = 0, fib(1) = 1
-                    --- fib(n) = fib(n-1) + fib(n-2)
+    --- Fibonacci:
+        --- Each number is the sum of the two previous numbers
+        --- The base cases: fib(0) = 0, fib(1) = 1
+        --- fib(n) = fib(n-1) + fib(n-2)
 
-    --- GCD:    --- Greatest common divisor that divides two numbers a, b
-                --- let n = gcd(a, b):  --- a%n = b%n = 0
-                                        --- (a+b)%n = (a-b)%n = 0
-                                        --- (a%n + b%n)%n = (0 + 0)%n = 0
-                                        --- gcd(a, b) = gcd(a-b, b) = gcd(a-2b, b) = ...
-                                        --- gcd(a, b) = gcd(a%b, b) = gcd(b, a%b);
-                --- If you have the prime factorization of a, b, the gcd is
-                    the minimum power of p for all common primes inside a, b
+    --- GCD:
+        --- Greatest common divisor that divides two numbers a, b
+        --- let n = gcd(a, b):
+            --- a%n = b%n = 0
+            --- (a+b)%n = (a-b)%n = 0
+            --- (a%n + b%n)%n = (0 + 0)%n = 0
+            --- gcd(a, b) = gcd(a-b, b) = gcd(a-2b, b) = ...
+            --- gcd(a, b) = gcd(a%b, b) = gcd(b, a%b);
+        --- If you have the prime factorization of a, b, the gcd is
+            the minimum power of p for all common primes inside a, b
 
-    --- LCM:    --- Least common multiple that a, b divide it
-                --- If you have the prime factorization of a, b, the lcm is
-                    the maximum power of p for all primes inside a, b
-                --- lcm(a, b) = a / gcd(a, b) * b
+    --- LCM:
+        --- Least common multiple that a, b divide it
+        --- If you have the prime factorization of a, b, the lcm is
+            the maximum power of p for all primes inside a, b
+        --- lcm(a, b) = a / gcd(a, b) * b
 
-    --- Permutation:    --- Number of arrangements r objects out of n objects (we care about order)
-                        --- It depends on the rule of product:
-                            First you have n choices then n-1 the n-2 then ... then n-r+1
-                        --- P(n, r) = n! / (n-r)!
+    --- Permutation:
+        --- Number of arrangements r objects out of n objects (we care about order)
+        --- It depends on the rule of product:
+            First you have n choices then n-1 the n-2 then ... then n-r+1
+        --- P(n, r) = n! / (n-r)!
 
-    --- Combinations:   --- Number of arrangements r objects out of n objects (we don't care about order)
-                        --- C(n, r) = n! / ( (n-r)! * r! ) = P(n, r) / r!
+    --- Combinations:
+        --- Number of arrangements r objects out of n objects (we don't care about order)
+        --- C(n, r) = n! / ( (n-r)! * r! ) = P(n, r) / r!
 
-    --- Fast Power: --- If you have 5^6, you can calculate 5^3 and square it
-                    --- If you have 5^9, you can calculate 5^4 and square it and multiply by 5
+    --- Fast Power:
+        --- If you have 5^6, you can calculate 5^3 and square it
+        --- If you have 5^9, you can calculate 5^4 and square it and multiply by 5
 
-    --- Geometric Series Sum:   --- If you have a^1 + a^2 + a^3 + a^4 + a^5 + a^6
-                                --- You can simplify: a^1 + a^2 + a^3 + a^3(a^1 + a^2 + a^3)
-                                --- Again: (a^1 + a^2 + a^3) * (1 + a^3)
-                                --- Again: (a^1 + a^2 + a^3) * (1 + a^3 + a^2 + a^1 - (a^2 + a^1))
-                                --- Generalization: if k even: ans(k) = ans(k/2) * (1 + ans(k/2) - ans(k/2 - 1))
-                                                    if k odd : ans(k) = a * (1 + ans(k-1))
-                                                    if k = 0 : return 0
+    --- Geometric Series Sum:
+        --- If you have a^1 + a^2 + a^3 + a^4 + a^5 + a^6
+        --- You can simplify: a^1 + a^2 + a^3 + a^3(a^1 + a^2 + a^3)
+        --- Again: (a^1 + a^2 + a^3) * (1 + a^3)
+        --- Again: (a^1 + a^2 + a^3) * (1 + a^3 + a^2 + a^1 - (a^2 + a^1))
+        --- Generalization: if k even: ans(k) = ans(k/2) * (1 + ans(k/2) - ans(k/2 - 1))
+                            if k odd : ans(k) = a * (1 + ans(k-1))
+                            if k = 0 : return 0
 */
 int fibonacci(int n) {
     if (n <= 1)
@@ -399,10 +417,11 @@ vector<int> extended_gcd(int a, int b) {
 
 /// === Chapter: Linear Diophantine
 /*
-    --- Diophantine equations:  --- Use extended GCD to solve: a*x + b*y = c
-                                --- If c = gcd(a, b), the answer from the extended GCD is true
-                                --- else solve for c = gcd(a, b) then multiply by c / gcd(a, b)
-                                --- The algorithm work iff c % gcd(a, b) = 0
+    --- Diophantine equations:
+        --- Use extended GCD to solve: a*x + b*y = c
+        --- If c = gcd(a, b), the answer from the extended GCD is true
+        --- else solve for c = gcd(a, b) then multiply by c / gcd(a, b)
+        --- The algorithm work iff c % gcd(a, b) = 0
 */
 pair<int, int> linear_diophantine(int a, int b, int c) {
     vector<int> ans = extended_gcd(a, b);
@@ -421,25 +440,28 @@ pair<int, int> linear_diophantine(int a, int b, int c) {
 
     --- if (a*x = a*y (mod n)) and gcd(a, n) = d, we can rearrange the equation to (x = y (mod n/d))
 
-    --- Some Facts: --- a = b (mod n), then a^m = b^m (mod n), m >= 1
-                    --- (x + y)^p = x^p + y^p (mod p), p is prime
-                    --- a = b (mod n) and b = c (mod n) then a = c (mod n)
-                        a = b (mod n) and c = d (mod n) then a+c = b+d (mod n)
-                        a = b (mod n) and c = d (mod n) then a*c = b*d (mod n)
-                        a = b (mod n) then a+c = b+c (mod n)
-                        a = b (mod n) then a*c = b*c (mod n)
-                    --- a*x = b (mod n) then x = b*a^-1
+    --- Some Facts:
+        --- a = b (mod n), then a^m = b^m (mod n), m >= 1
+        --- (x + y)^p = x^p + y^p (mod p), p is prime
+        --- a = b (mod n) and b = c (mod n) then a = c (mod n)
+            a = b (mod n) and c = d (mod n) then a+c = b+d (mod n)
+            a = b (mod n) and c = d (mod n) then a*c = b*d (mod n)
+            a = b (mod n) then a+c = b+c (mod n)
+            a = b (mod n) then a*c = b*c (mod n)
+        --- a*x = b (mod n) then x = b*a^-1
 
-    --- Large Powers:   --- assume that we want to calculate: a^m mod n
-                        --- we want to reduce the large power
-                        --- we want to find such k that a^k mod n = -1, 0, 1 (small values)
-                        --- rewrite the equation: a^(q*k + r) mod n
-                        --- ((a^k)^q * a^r) mod n
+    --- Large Powers:
+        --- assume that we want to calculate: a^m mod n
+        --- we want to reduce the large power
+        --- we want to find such k that a^k mod n = -1, 0, 1 (small values)
+        --- rewrite the equation: a^(q*k + r) mod n
+        --- ((a^k)^q * a^r) mod n
 
-    --- Linear Modular Equation:    --- solve: a*x = b (mod m)
-                                    --- rewrite the equation: a*x - b = y*m
-                                    --- ax + y*m = b (mod m)
-                                    --- Note that: all possible solution are between 0, m-1 (due to properties of modular arithmetic)
+    --- Linear Modular Equation:
+        --- solve: a*x = b (mod m)
+        --- rewrite the equation: a*x - b = y*m
+        --- ax + y*m = b (mod m)
+        --- Note that: all possible solution are between 0, m-1 (due to properties of modular arithmetic)
 */
 vector<int> linear_modular_equation(int a, int b, int mod) {
     vector<int> v = extended_gcd(a, mod), sols;
@@ -458,26 +480,27 @@ vector<int> linear_modular_equation(int a, int b, int mod) {
 
 /// === Chapter: Euler Totient Function
 /*
-    ---Euler Totient Function : --- Phi Function : counts the number of coprimes to n
-                                --- Coprimes : gcd(a, b) = 1
-                                --- phi(a * b * c) = phi(a) * phi(b) * phi(c) iff a, b, c, are coprimes
-                                --- phi(p^k) = p^k - p^(k-1) = p^(k-1) * (p-1)
-                                --- phi(1) = phi(2) = 1
-                                --- phi(n) is even for n > 2
-                                --- phi(n^k) = n^(k-1) * phi(n)
-                                --- sqrt(n) <= phi(n) <= n - sqrt(n) except for 2, 6
-                                --- n = sum of phi(i) for all i divides n
-                                --- phi(n) * d(n) = sum of gcd(k-1, n) for all k such that gcd(k, n) = 1
-                                    and d(n) is number of divisors of n
-                                --- We can brute force to calculate phi(n) or we can do better
-                                --- We can represent n as: n = p1^a1 * p2^a2 * ... * pk^ak
-                                --- p1, p2, ..., pk are coprimes
-                                --- so: phi(n) = phi(p1^a1) * phi(p2^a2) * ... * phi(pk^ak)
-                                --- phi(n!) = product of (if i prime ? i-1 else i) for all 2 <= i <= n
-                                --- Totient Range Query:    --- loop on all prime numbers i from 2 to n
-                                                            --- make totient[i] = n-1
-                                                            --- loop on all multiples of i in the range
-                                                            --- multiply totient[j*i] by the answer
+    ---Euler Totient Function :
+        --- Phi Function : counts the number of coprimes to n
+        --- Coprimes : gcd(a, b) = 1
+        --- phi(a * b * c) = phi(a) * phi(b) * phi(c) iff a, b, c, are coprimes
+        --- phi(p^k) = p^k - p^(k-1) = p^(k-1) * (p-1)
+        --- phi(1) = phi(2) = 1
+        --- phi(n) is even for n > 2
+        --- phi(n^k) = n^(k-1) * phi(n)
+        --- sqrt(n) <= phi(n) <= n - sqrt(n) except for 2, 6
+        --- n = sum of phi(i) for all i divides n
+        --- phi(n) * d(n) = sum of gcd(k-1, n) for all k such that gcd(k, n) = 1
+            and d(n) is number of divisors of n
+        --- We can brute force to calculate phi(n) or we can do better
+        --- We can represent n as: n = p1^a1 * p2^a2 * ... * pk^ak
+        --- p1, p2, ..., pk are coprimes
+        --- so: phi(n) = phi(p1^a1) * phi(p2^a2) * ... * phi(pk^ak)
+        --- phi(n!) = product of (if i prime ? i-1 else i) for all 2 <= i <= n
+        --- Totient Range Query:    --- loop on all prime numbers i from 2 to n
+                                    --- make totient[i] = n-1
+                                    --- loop on all multiples of i in the range
+                                    --- multiply totient[j*i] by the answer
 */
 vector<int> phis(N);
 int phi_of_prime_power_k(int p, int k) {
@@ -528,49 +551,51 @@ void all_phi() {
 
 /// === Chapter: Mobius Function
 /*
-    --- Square-free Integer:    --- A number which there is no repeated prime factor in it (all powers <= 1)
-    --- Mobius Function:    --- mobius(n) [μ(n)] =  [
-                                                        0: n is not square free
-                                                        +1: n is one or n is square free and has even number of prime factors
-                                                        -1: n is square free and has odd number of prime factors
-                                                    ]
-                            --- Mainly, it is used in inclusion-exclusion problems, like this
-                            --- It can be used to calculate the index of a number in square-free list
-                                let x be the value, let y be the index and it is initially is x
-                                for all numbers i from 2 to sqrt(x)
-                                y := y + mobius[i] * ( x / (i*i) )
-                                [
-                                    --- if i = 2 it will remove 4, 8, 12, 16, ..
-                                    --- if i = 3 it will remove 9, 18, 27, 81, ..
-                                    --- if i = 4 it will not remove anything because 2 has done it before
-                                    --- if i = 5 it will remove 25, 50, 75, 100, ..
-                                    --- if i = 6 it will remove 36, 72, 144, 288, ...
-                                            wait, 36, 72, 144, 288, ... are removed twice by 2 and 3
-                                            so they must be add because they are deleted twice
+    --- Square-free Integer: A number which there is no repeated prime factor in it (all powers <= 1)
+    --- Mobius Function:
+        --- mobius(n) [μ(n)] =  [
+                                    0: n is not square free
+                                    +1: n is one or n is square free and has even number of prime factors
+                                    -1: n is square free and has odd number of prime factors
                                 ]
-                            --- Count number of triple such that: a, b, c <= n and gcd(a, b, c) = 1
-                                --- Lets do a reverse thinking: the answer is n^3 - {number of triple such that: a, b, c <= n and gcd(a, b, c) != 1}
-                                --- let the answer be n^3
-                                --- for all numbers i from 2 to n
-                                --- answer := answer + mobius[i] * (n/i)^3 [Why?]
-                                [
-                                    --- if i = 2 there are n/2 multiple of 2 in the range so for all of these number
-                                        the gcd is not 1, we will remove (n/2)^3 from the answer
-                                    --- if i = 2 there are n/3 multiple of 3 in the range so for all of these number
-                                        the gcd is not 1, we will remove (n/3)^3 from the answer
-                                    --- if i = 4 the answer will not change because 2 has done it before
-                                    --- if i = 5 there are n/5 multiple of 5 in the range so for all of these number
-                                        the gcd is not 1, we will remove (n/5)^3 from the answer
-                                    --- if i = 6 there are n/6 multiple of 6 in the range so for all of these number
-                                        the gcd is not 1, we will remove (n/6)^3 from the answer
-                                            wait, the answer of 6 has been removed twice by 2 and 3
-                                            so the answer of 6 must be added to the answer
-                                ]
-                            --- Mobius Range Query: --- initialize mobius[i] = 1
-                                                    --- loop on all prime numbers i from 2 to n
-                                                    --- mobius[i] = 1
-                                                    --- loop on all multiples of i in the range
-                                                    --- mobius[j] = (j % (i*i) == 0 ? 0 : -mobius[j])
+        --- Mainly, it is used in inclusion-exclusion problems, like this
+        --- It can be used to calculate the index of a number in square-free list
+            let x be the value, let y be the index and it is initially is x
+            for all numbers i from 2 to sqrt(x)
+            y := y + mobius[i] * ( x / (i*i) )
+            [
+                --- if i = 2 it will remove 4, 8, 12, 16, ..
+                --- if i = 3 it will remove 9, 18, 27, 81, ..
+                --- if i = 4 it will not remove anything because 2 has done it before
+                --- if i = 5 it will remove 25, 50, 75, 100, ..
+                --- if i = 6 it will remove 36, 72, 144, 288, ...
+                        wait, 36, 72, 144, 288, ... are removed twice by 2 and 3
+                        so they must be add because they are deleted twice
+            ]
+        --- Count number of triple such that: a, b, c <= n and gcd(a, b, c) = 1
+            --- Lets do a reverse thinking: the answer is n^3
+                {number of triple such that: a, b, c <= n and gcd(a, b, c) != 1}
+            --- let the answer be n^3
+            --- for all numbers i from 2 to n
+            --- answer := answer + mobius[i] * (n/i)^3 [Why?]
+            [
+                --- if i = 2 there are n/2 multiple of 2 in the range so for all of these number
+                    the gcd is not 1, we will remove (n/2)^3 from the answer
+                --- if i = 2 there are n/3 multiple of 3 in the range so for all of these number
+                    the gcd is not 1, we will remove (n/3)^3 from the answer
+                --- if i = 4 the answer will not change because 2 has done it before
+                --- if i = 5 there are n/5 multiple of 5 in the range so for all of these number
+                    the gcd is not 1, we will remove (n/5)^3 from the answer
+                --- if i = 6 there are n/6 multiple of 6 in the range so for all of these number
+                    the gcd is not 1, we will remove (n/6)^3 from the answer
+                        wait, the answer of 6 has been removed twice by 2 and 3
+                        so the answer of 6 must be added to the answer
+            ]
+        --- Mobius Range Query: --- initialize mobius[i] = 1
+                                --- loop on all prime numbers i from 2 to n
+                                --- mobius[i] = 1
+                                --- loop on all multiples of i in the range
+                                --- mobius[j] = (j % (i*i) == 0 ? 0 : -mobius[j])
 */
 vector<int> mobiuses(N);
 pair<bool, int> square_free(int n) {
@@ -612,36 +637,41 @@ void all_mobius() {
     --- Modular Multiplicative Inverse: a * (what) = 1 (mod m)
     --- We can calculate (what) iff gcd(a, m) = 1
     --- To find Modular Multiplicative Inverse of a considering m, you want to find a^-1 mod m
-    --- Follow my leads:    --- a*x = 1 (mod m)
-                            --- a*x - 1 = y*m
-                            --- a*x + m*(-y) = 1 (Wait, Extended GCD? YES!!)
-                            --- The x is the answer (a^-1);
-    --- Follow my leads again:  --- Euler has a theorem: if gcd(a, m) = 1, a^phi(m) = 1 (mod m)
-                                --- a^(phi(m) - 1) = 1/a = a^-1 (mod m)
-                                --- if m is prime, a^-1 = a^(m-2) (mod m)
-    --- Mod Inverse for range:  --- Given p, calculate mod inverse of all numbers 1 from 1 to p-1
-                                --- Follow my leads again:  --- p%i = p - (p/i)*i
-                                                                since i < p, (p%i)%p = p%i
-                                                            --- (p%i)%p = p%p - [(p/i) * i]%p
-                                                            --- p%i = - (p/i) * i (mod p)
-                                                                divide by (i * p%i)
-                                                            --- 1/i = - (p/i) * 1/(p%i) (mod p)
-                                                            --- inv[i] = - (p/i) * inv[p % i] (mod p)
-                                                            --- inv[i] = p - (p/i) * inv[p % i] (mod p)
-                                                                [initialize all values of inv by 1]
-    --- Euler Theorem and LARGE Powers: --- remember:   a^phi(m) = 1 (mod m), a^(phi(m)-1) = 1/a (mod m) [gcd(a, m) = 1]
-                                                        a^(p-1) = 1 (mod p), a^(p-2) = 1/a (mod p) [p is prime]
-                                        --- a^b = a^(n*phi(m) + k)  = a^(n*phi(m)) * a^k (mod m)
-                                                                    = [a^phi(m)]^n * a^k (mod m)
-                                                                    = [1]^n * a^k (mod m)
-                                                                    = a^k (mod m)
-                                                                    = a^(b % phi(m)) (mod m)
-                                        --- Compute (1/a^b) mod p   = (1/a % p)^b mod p
-                                                                    = (a^(p-2) % p)^b mod p
-                                                                        [Use the above relation]
-                                                                    = a^[(p-2)%(p-1) * b%(p-1)] mod p
-                                                                    = a^[-1 * b%(p-1)] mod p
-                                                                    = a^[p-1 - * b%(p-1)] mod p
+    --- Follow my leads:
+        --- a*x = 1 (mod m)
+        --- a*x - 1 = y*m
+        --- a*x + m*(-y) = 1 (Wait, Extended GCD? YES!!)
+        --- The x is the answer (a^-1);
+    --- Follow my leads again:
+        --- Euler has a theorem: if gcd(a, m) = 1, a^phi(m) = 1 (mod m)
+        --- a^(phi(m) - 1) = 1/a = a^-1 (mod m)
+        --- if m is prime, a^-1 = a^(m-2) (mod m)
+    --- Mod Inverse for range:
+        --- Given p, calculate mod inverse of all numbers 1 from 1 to p-1
+        --- Follow my leads again:
+            --- p%i = p - (p/i)*i
+                since i < p, (p%i)%p = p%i
+            --- (p%i)%p = p%p - [(p/i) * i]%p
+            --- p%i = - (p/i) * i (mod p)
+                divide by (i * p%i)
+            --- 1/i = - (p/i) * 1/(p%i) (mod p)
+            --- inv[i] = - (p/i) * inv[p % i] (mod p)
+            --- inv[i] = p - (p/i) * inv[p % i] (mod p)
+                [initialize all values of inv by 1]
+    --- Euler Theorem and LARGE Powers:
+        --- remember:   a^phi(m) = 1 (mod m), a^(phi(m)-1) = 1/a (mod m) [gcd(a, m) = 1]
+                        a^(p-1) = 1 (mod p), a^(p-2) = 1/a (mod p) [p is prime]
+        --- a^b = a^(n*phi(m) + k)  = a^(n*phi(m)) * a^k (mod m)
+                                    = [a^phi(m)]^n * a^k (mod m)
+                                    = [1]^n * a^k (mod m)
+                                    = a^k (mod m)
+                                    = a^(b % phi(m)) (mod m)
+        --- Compute (1/a^b) mod p   = (1/a % p)^b mod p
+                                    = (a^(p-2) % p)^b mod p
+                                        [Use the above relation]
+                                    = a^[(p-2)%(p-1) * b%(p-1)] mod p
+                                    = a^[-1 * b%(p-1)] mod p
+                                    = a^[p-1 - * b%(p-1)] mod p
 */
 vector<int> invs(N);
 int mod_inv(int a, int n) {
@@ -669,47 +699,51 @@ int euler_theorem_for_large_powers(int a, int b, int mod) {
 /// === Chapter: Modular Arithmetic Applications
 /*
     --- Factorial mod p after removing all p in the factorial:
-                    --- Assume we want to calculate 33! % 5 after removing all p in the factorial
-                    --- 1 * 2 * 3 * 4 * 5 * 6 * 7 * 8 * 9 * 10 * 11 * ...
-                        1 * 2 * 3 * 4 * 1 * 6 * 7 * 8 * 9 *  2 * 11 * ...
-                        So the problem will be
-                    ---  1  2  3  4  1 ( 5)
-                         6  7  8  9  2 (10)
-                        11 12 13 14  3 (15)
-                        16 17 18 19  4 (20)
-                        21 22 23 24  5 (25)
-                        26 27 28 29  6 (30)
-                        31 32 33
-                    --- Then we take mode 5 for all numbers
-                            1  2  3  4  1 ( 5)
-                            1  2  3  4  2 (10)
-                            1  2  3  4  3 (15)
-                            1  2  3  4  4 (20)
-                            1  2  3  4  5 (25)
-                            1  2  3  4  6 (30)
-                            1  2  3
-                    --- We now har this: (4! % 5)^6 * (3! % 5) * (a smaller problem with 6 instead of 33 F(6))
-                    --- Recall: (p-1)! % p = p-1 = -1 (Wilson's Theorem)
-                    --- Then: (-1)^6 * (3! % 5) * (F(6) % 5)
+        --- Assume we want to calculate 33! % 5 after removing all p in the factorial
+        --- 1 * 2 * 3 * 4 * 5 * 6 * 7 * 8 * 9 * 10 * 11 * ...
+            1 * 2 * 3 * 4 * 1 * 6 * 7 * 8 * 9 *  2 * 11 * ...
+            So the problem will be
+        ---  1  2  3  4  1 ( 5)
+             6  7  8  9  2 (10)
+            11 12 13 14  3 (15)
+            16 17 18 19  4 (20)
+            21 22 23 24  5 (25)
+            26 27 28 29  6 (30)
+            31 32 33
+        --- Then we take mode 5 for all numbers
+                1  2  3  4  1 ( 5)
+                1  2  3  4  2 (10)
+                1  2  3  4  3 (15)
+                1  2  3  4  4 (20)
+                1  2  3  4  5 (25)
+                1  2  3  4  6 (30)
+                1  2  3
+        --- We now har this: (4! % 5)^6 * (3! % 5) * (a smaller problem with 6 instead of 33 F(6))
+        --- Recall: (p-1)! % p = p-1 = -1 (Wilson's Theorem)
+        --- Then: (-1)^6 * (3! % 5) * (F(6) % 5)
 
-    --- Combinations mod p:     --- n choose k = n! / (k! * (n-k)!)
-                                --- let: a = power of p in n!, b = power of p in k!, c = power of p in (n-k)!
-                                --- if a-b-c != 0 then the combinations is divisible by p
-                                --- remove all powers of p in n!, k!, and (n-k)!
-                                --- then for each factorial calculate mod p using the above algorithm after removing all the powers
+    --- Combinations mod p:
+        --- n choose k = n! / (k! * (n-k)!)
+        --- let: a = power of p in n!, b = power of p in k!, c = power of p in (n-k)!
+        --- if a-b-c != 0 then the combinations is divisible by p
+        --- remove all powers of p in n!, k!, and (n-k)!
+        --- then for each factorial calculate mod p using
+            the above algorithm after removing all the powers
 
-    --- Locus Theorem:  --- to calculate n choose k mod p
-                        --- first write n and k in base p
-                        --- let: n = n_k*p^k + n_(k-1)*p^(k-1) + ... + n1*p^1 + n0
-                                 m = m_k*p^k + m_(k-1)*p^(k-1) + ... + m1*p^1 + m0
-                        --- (n choose k) mod p = (n_k choose m_k) * (n_(k-1) choose m_(k-1)) * ... * (n1 choose m1) * (n0 choose m0)
-                        --- There is a theorem called Generalized Locus Theorem that handles mod p^k
-                        --- If the mod is not prime, we can write the mod as: p1^k1 * p2^k2 * ...
-                        --- calculate the combination using the generalized locus theorem for p_i^k_i
-                        --- Using the Chinese Remainder Theorem, We can solve the main question
+    --- Locus Theorem:
+        --- to calculate n choose k mod p
+        --- first write n and k in base p
+        --- let: n = n_k*p^k + n_(k-1)*p^(k-1) + ... + n1*p^1 + n0
+                 m = m_k*p^k + m_(k-1)*p^(k-1) + ... + m1*p^1 + m0
+        --- (n choose k) mod p = (n_k choose m_k) * (n_(k-1) choose m_(k-1)) * ... * (n1 choose m1) * (n0 choose m0)
+        --- There is a theorem called Generalized Locus Theorem that handles mod p^k
+        --- If the mod is not prime, we can write the mod as: p1^k1 * p2^k2 * ...
+        --- calculate the combination using the generalized locus theorem for p_i^k_i
+        --- Using the Chinese Remainder Theorem, We can solve the main question
 
-    --- Catalan Numbers:    --- Cn = (2n choose n) / (n+1) = (2n)! / (n! * (n+1)!) = (2n choose n) - (2n choose (n+1))
-                            --- It is all about combinations and factorials, we can solve it using the above algorithms
+    --- Catalan Numbers:
+        --- Cn = (2n choose n) / (n+1) = (2n)! / (n! * (n+1)!) = (2n choose n) - (2n choose (n+1))
+        --- It is all about combinations and factorials, we can solve it using the above algorithms
 */
 int factorial_mod_p(int n, int p) {
     int res = 1;
@@ -775,24 +809,27 @@ int catalan(int n, int p) {
                                                             ...
                                                             x = ak (mod nk)
     --- Brute Force? Bad. Lets get into the theorem
-    --- To solve the system, there are some conditions must holds:  --- n1, n1, ..., nk must be pairwise coprime
-                                                                    --- ai = aj (mod gcd(ni, nj)) for all i, j
-                                                                    --- x are then congruent to lcm(n1, n2, ..., nk)
+    --- To solve the system, there are some conditions must holds:
+        --- n1, n1, ..., nk must be pairwise coprime
+        --- ai = aj (mod gcd(ni, nj)) for all i, j
+        --- x are then congruent to lcm(n1, n2, ..., nk)
     --- if a, b, c are pairwise coprime, then gcd(a, b) = gcd(b, c) = gcd(a, c) = 1, and lcm(a, b, c) = a * b * c
     --- To covert a%n to b%n, just make it as (a/a * b)%n = (a * a^-1 * b)%n
     --- Now the system is: a[i] and mods[i] and b[i] and c[i] and answer=0
-    --- Follow my leads:    --- Step 1: for the ith equation, calculate the product of all mods except mods[i]
-                                and then assign it to b[i] then take mod mods[i] and assign it to c[i]
-                            --- now we want to convert b[i] to c[i] (mod mods[i])
-                            --- using the relationship above: (b[i] * b[i]^-1 * c[i]) (mod mods[i]) and add it to the answer
-                            --- Boom, we solved it, x is the answer [we can take mod lcm(mods) to get the smallest answer]
+    --- Follow my leads:
+        --- Step 1: for the ith equation, calculate the product of all mods except mods[i]
+            and then assign it to b[i] then take mod mods[i] and assign it to c[i]
+        --- now we want to convert b[i] to c[i] (mod mods[i])
+        --- using the relationship above: (b[i] * b[i]^-1 * c[i]) (mod mods[i]) and add it to the answer
+        --- Boom, we solved it, x is the answer [we can take mod lcm(mods) to get the smallest answer]
 
     --- Now we want to solve if the mods are not pairwise coprimes
     --- if we have two equations, can we solve it? lets try
-    --- Follow my leads:    --- The equations are: x = a1 mod n1, x = a2 mod n2
-                            --- x = b1*n1 + a1 = b2*n2 + a2
-                            --- n1*b1 + n2*(-b2)x = a2-a1 (wait, Diophantine? YES!!);
-                            --- new rem: rem + mod*x, new mod: lcm(mod, mods[i]), rem %= mod
+    --- Follow my leads:
+        --- The equations are: x = a1 mod n1, x = a2 mod n2
+        --- x = b1*n1 + a1 = b2*n2 + a2
+        --- n1*b1 + n2*(-b2)x = a2-a1 (wait, Diophantine? YES!!);
+        --- new rem: rem + mod*x, new mod: lcm(mod, mods[i]), rem %= mod
 
     --- There is another way to solve if mods are not pairwise coprime
     --- if n1, n2 are not coprime? extend the 2 equetions to 4 equations
@@ -874,53 +911,58 @@ int composite_mod(int a, int mod) {
     index 22: 3 2 0 1
     index 23: 3 2 1 0
 
-    --- nth Premutation:    --- get m = length and n = the index of the needed permutation (0-based)
-                                let array perm of length m, numbers of length m and has numbers from 0 to m-1
-                                for all numbers i form m-1 to 1
-                                    let p = n / i! [index of the next number in the remaining numbers]
-                                    perm[m - 1 - p] = numbers[p]
-                                    erase index p from numbers
-                                    n := n mod i!
-                                return perm
+    --- nth Premutation:
+        --- get m = length and n = the index of the needed permutation (0-based)
+            let array perm of length m, numbers of length m and has numbers from 0 to m-1
+            for all numbers i form m-1 to 1
+                let p = n / i! [index of the next number in the remaining numbers]
+                perm[m - 1 - p] = numbers[p]
+                erase index p from numbers
+                n := n mod i!
+            return perm
 
-    --- Index of permutation:    --- let perm a the permutation of length m
-                                    let idx=0
-                                    for all number i from 0 to m-1
-                                        idx += (n-1-i)! * prem[i]
-                                        for all numbers j from i+1 to m-1
-                                            if perm[j] > perm[i], prem[j] := perm[j] - 1
-                                    return idx
+    --- Index of permutation:
+        --- let perm a the permutation of length m
+            let idx=0
+            for all number i from 0 to m-1
+                idx += (n-1-i)! * prem[i]
+                for all numbers j from i+1 to m-1
+                    if perm[j] > perm[i], prem[j] := perm[j] - 1
+            return idx
 
-    --- Permutation Multiplication(Mapping):    --- mapping a permutation a = [a1, a2, .., ak] to a permutation b = [b1, b2, .., bk]
-                                                    means let a = [a[b1], a[b2], .., a[bk]] and is denoted by a*b
-                                                --- It is associative, and not commutative
-                                                    a*b*c = (a*b)*c = a*(b*c)
-                                                    a*b != b*a
-                                                --- We can use the same logic of fast power to mapping a permutation a huge number of times
-                                                    a^12 = a^6 * a^6 (Order of log(power))
-                                                --- Can we do better? YES! using permutation cycles
+    --- Permutation Multiplication(Mapping):
+        --- mapping a permutation a = [a1, a2, .., ak] to a permutation b = [b1, b2, .., bk]
+            means let a = [a[b1], a[b2], .., a[bk]] and is denoted by a*b
+        --- It is associative, and not commutative
+            a*b*c = (a*b)*c = a*(b*c)
+            a*b != b*a
+        --- We can use the same logic of fast power to mapping a permutation a huge number of times
+            a^12 = a^6 * a^6 (Order of log(power))
+        --- Can we do better? YES! using permutation cycles
 
-    --- Permutation Cycles: --- Cycle: Each number maps to a number, maps to a number, ..., and return to the first number
-                                1 -> 3, 3 -> 4, 4 -> 2, 2 -> 1
-                                ex: 2 0 1 4 3
-                                    0 -> 2
-                                    2 -> 1
-                                    1 -> 0 (Odd Cycle)
+    --- Permutation Cycles:
+        --- Cycle: Each number maps to a number, maps to a number, ..., and return to the first number
+            1 -> 3, 3 -> 4, 4 -> 2, 2 -> 1
+            ex: 2 0 1 4 3
+                0 -> 2
+                2 -> 1
+                1 -> 0 (Odd Cycle)
 
-                                    3 -> 4
-                                    4 -> 3 (Even Cycle)
-                            --- A cycle of length n, if we applied n time , it backs to its origin
-                                n+1 time -> 1 time
-                                n+2 time -> 2 times
-                                n+3 time -> 3 times
-                                ...
-                                m times  -> m%n times
-                            --- If a permutation perm has x cycles and we apply perm on itself
-                                odd cycles will remains, and even cycles will be divided to 2 cycle with half of the size
-                                and the elements of the original disjoint cycles will never be mixed
-    --- Permutaion Order:   --- Remember: Each cycle with length ni repeats itself every ni times
-                            --- So, if you have x cycles with length n1, n2, .., nx, the permutation will repeat itself
-                                every lcm(n1, n2, .., nx) times
+                3 -> 4
+                4 -> 3 (Even Cycle)
+        --- A cycle of length n, if we applied n time , it backs to its origin
+            n+1 time -> 1 time
+            n+2 time -> 2 times
+            n+3 time -> 3 times
+            ...
+            m times  -> m%n times
+        --- If a permutation perm has x cycles and we apply perm on itself
+            odd cycles will remains, and even cycles will be divided to 2 cycle with half of the size
+            and the elements of the original disjoint cycles will never be mixed
+    --- Permutaion Order:
+        --- Remember: Each cycle with length ni repeats itself every ni times
+        --- So, if you have x cycles with length n1, n2, .., nx, the permutation will repeat itself
+            every lcm(n1, n2, .., nx) times
     --- Stirleng Numbers:   OK, we will back to him
     --- The video will discuss some problems, please listen to them
 */
