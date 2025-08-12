@@ -1,3 +1,87 @@
+/*
+    Intro:
+        we can solve triangles with this two rules:
+        rule of sins: sin(A) / a = sin(B) / b = sin(C) / c
+        rule of cosines: a^2 = b^2 + c^2 - 2bc * cos(A)
+
+        sin(180 - x) = cos(x)
+        cos(180 - x) = sin(x)
+        tan(180 - x) = cot(x)
+        cot(180 - x) = tan(x)
+        sec(180 - x) = csc(x)
+        csc(180 - x) = sec(x)
+
+        sin(a + b) = sin(a) * cos(b) + sin(b) * cos(a)
+        sin(a - b) = sin(a) * cos(b) - sin(b) * cos(a)
+        cos(a + b) = cos(a) * cos(b) - sin(a) * sin(b)
+        cos(a - b) = cos(a) * cos(b) + sin(a) * sin(b)
+        tan(a + b) = (tan(a) + tab(b)) / (1 - tan(a) * tan(b))
+        tan(a + b) = (tan(a) - tab(b)) / (1 + tan(a) * tan(b))
+
+    Point and Vector:
+        Vector: magnitude + angle
+        Given (x, y) -> magnitude: sqrt(x^2 + y^2), angle: atan(y / x)
+        Vector addition: (x1, y1) + (x2, y2) = (x1 + x2, y1 + y2)
+        Vector subtraction: C = A - B -> A = B + C, (xc, yc) = (xa - xb, ya - yb)
+        Dot Product:
+            a.b = xa * xb + ya * yb + za * zb + ... = |a| * |b| * cos(theta)
+            theta < 90: a.b > 0
+            theta = 90: a.b = 0
+            theta > 90: a.b < 0
+            a.b = b.a
+            a.(b + c) = a.b + a.c
+            (c1 * a).(c2 * b) = c1 * c2 * (a.b)
+            a.b = a.c -> a.(b - c) = 0 -> a, b-c are perpendicular
+        Cross Product
+            a * b = |a| * |b| * sin(theta)
+            a, b are convex -> a * b > 0
+            theta = 0 or 180 -> a * b = 0
+            a, b are concave -> a * b < 0
+            a * b = -b * a
+            a * (b + c) = a * b + a * c
+            a * b * c + b * c * a + c * a * b = 0
+            |a * b|^2 = (|a| * |b|)^2 - (a.b)^2
+        Standard Basis:
+            ex = (1, 0), ey = (0, 1)
+            i = ex = (1, 0, 0), j = ey = (0, 1, 0), k = ez = (0, 0, 1)
+            i = j * k, j = k * i, k = i * j
+            i * i = j * j = k * k = 0
+            a * b = [i j k; xa ya za; xb yb zb]
+        Euclidean Transformation:
+            Translation:
+                x' = x + h, y' = y + k
+                [x'; y'; 1] = [1, 0, h; 0, 1, k; 0, 0, 1] * [x; y; 1]
+            Rotation by angle T clockwise:
+                x' = cos(T) * x - sin(T) * y
+                y' = sin(T) * x + cos(T) * y
+                [x'; y'; 1] = [cos(T), -sin(T), 0; sin(T), cos(T), 0; 0, 0, 1] * [x; y; 1]
+            Rotation and Translation:
+                [x'; y'; 1] = [cos(T), -sin(T), h; sin(T), cos(T), k; 0, 0, 1] * [x; y; 1]
+            Translation and Rotation:
+                [x'; y'; 1] = [cos(T), -sin(T), h*cos(T)-k*sin(T); sin(T), cos(T), h*sin(T)+k*cos(T); 0, 0, 1] * [x; y; 1]
+
+    Complex Numbers and 2D Points
+        Complex Numbers:
+            Imaginary Unit i: i^2 = -1
+            Complex Number: a + b*i (a, b are real)
+        We can describe complex numbers in the coordinate plane as point (a, b)
+        z = a + b*i = (a, b) = (r*cos(T), r*sin(T))
+        r = sqrt(a^2 + b^2), T = atan(a / b)
+        T = 0 -> z = 1
+        T = pi/2 -> z = i
+        T = pi -> z = -1
+        T = 3pi/2 -> z = -i
+
+        v1 = x1 + i*y1 -> conj(v1) = x1 - i*y1
+        v2 = x2 + i*y2
+        conj(v1) * (v2) = (x1*x2 + y1*y2) + (x1*y2 - x2*y1)*i = (dot product) + (cross product)*i
+
+        revisit rotation and reflection
+
+    Lines and Distances
+
+*/
+
 #include <bits/stdc++.h>
 #include <complex>
 #include <cmath>
@@ -21,30 +105,24 @@ const double rotation = 360.0;
 #define dot(a,b) ((conj(a)*(b)).X)
 #define cross(a,b) ((conj(a)*(b)).Y)
 #define same(a,b) (dot(vec(a,b),vec(b,a)) < eps)
-#define square(a) (dot(a,a))
+#define square(a) (dot((a),(a)))
 
-#define rotate(a,ang) ((p)*exp(point(0,ang)))
-#define rotate(a,ang,about) (rotate(vec(about,a),ang)+about)
+#define rotate0(a,ang) ((a)*exp(point(0,ang)))
+#define rotate_about(a,ang,about) (rotate0(vec(about,a),ang)+about)
 
-#define reflect(a,b) (conj(a/b)*b)
+#define reflect0(a,b) (conj((a)/(b))*(b))
+#define reflect_about(p, p0, p1) (reflect0(vec(p0, p), vec(p0, p1)) + p0)
 
-double to_radians(double degree) {
-    return degree / 180.0 * pi;
-}
-
-double to_degree(double radian) {
-    return radian / pi * 180.0;
-}
-
+double to_radians(double degree) { return degree / 180.0 * pi; }
+double to_degree(double radian) { return radian / pi * 180.0; }
 int dcmp(double x, double y) {
-    if (fabs(x - y) == 0) return 0;
+    if (fabs(x - y) < eps) return 0;
     return (x < y ? -1 : 1);
 }
 
 bool is_collinear(point a, point b, point c) {
-    return dcmp(cross(b - a, c - a), 0) == 0;
+    return dcmp(fabs(cross(b - a, c - a)), 0) == 0;
 }
-
 bool is_point_on_ray(point a, point b, point c) // is point c on ray ab
 {
     if (!is_collinear(a, b, c))
@@ -55,7 +133,6 @@ bool is_point_on_ray(point a, point b, point c) // is point c on ray ab
     //     return true;
     // return same(normalize(b - a), normalize(c - a));
 }
-
 bool is_point_on_segment(point a, point b, point c) // is point c on segment ab
 {
     return is_point_on_ray(a, b, c) && is_point_on_ray(b, a, c);
@@ -63,13 +140,11 @@ bool is_point_on_segment(point a, point b, point c) // is point c on segment ab
     // double ab = length(b - a), ac = length(c - a), bc = length(c - b);
     // return dcmp(ab, ac + bc) == 0;
 }
-
 double distance_to_line(point a, point b, point c) // distance between point c and line ab
 {
-    double d = cross(a - c, b - c) / length(b - a);
+    double d = cross(b - a, c - a) / length(a - b);
     return fabs(d);
 }
-
 double distance_to_segment(point a, point b, point c) // distance between point c and segment ab
 {
     if (dcmp(dot(b - a, c - a), 0) == -1)
@@ -78,7 +153,6 @@ double distance_to_segment(point a, point b, point c) // distance between point 
         return length(c - b);
     return distance_to_line(a, b, c);
 }
-
 point lines_intersect(point a, point b, point c, point d) {
     double d1 = cross(a - b, d - c);
     double d2 = cross(a - c, d - c);
@@ -90,7 +164,6 @@ point lines_intersect(point a, point b, point c, point d) {
     double t1 = d2 / d1;
     return a + (b - a) * t1;
 }
-
 int counter_clockwise(point a, point b, point c) {
     point v1 = b - a, v2 = c - b, v3 = c - a;
 
@@ -106,7 +179,6 @@ int counter_clockwise(point a, point b, point c) {
         return 1;
     return -1;
 }
-
 bool are_segments_intersect(point a, point b, point c, point d) {
     // bool x = same(a, b), y = same(c, d);
     // if (x && y) return same(a, c);
@@ -131,7 +203,6 @@ pair<double, point > circle(point a, point b, point c) {
     point center = lines_intersect(m1, end1, m2, end2);
     return {length(a - center), center};
 }
-
 vector<point > circle_line_intersection(double r, point c, point a, point b) // radius, center, line ab
 {
     double A = dot(b - a, b - a);
@@ -152,7 +223,6 @@ vector<point > circle_line_intersection(double r, point c, point a, point b) // 
     }
     return res;
 }
-
 vector<point > circle_circle_intersection(double r1, point c1, double r2, point c2) {
     // same circle with positive radius
     if (same(c1, c2) && dcmp(r1, r1) == 0 && dcmp(r1, 0) == 1)
@@ -180,7 +250,6 @@ vector<point > circle_circle_intersection(double r1, point c1, double r2, point 
     return res;
 }
 
-
 bool cmp(point a, point b) {
     double ang1 = to_degree(angle(a));
     double ang2 = to_degree(angle(b));
@@ -195,66 +264,87 @@ bool cmp(point a, point b) {
     return ang1 < ang2;
 }
 
+bool is_polygon_simple(vector<point > &p) {
+    bool ok = true;
+    p.push_back(p[0]);
+    for (int i = 0; i < (int) p.size() - 1; i++) {
+        for (int j = i + 2; j < (int) p.size() - 1; j++) {
+            if (are_segments_intersect(p[i], p[i + 1], p[j], p[j + 1]) && !(i == 0 && j == (int) p.size() - 2))
+                ok = false;
+        }
+    }
+    p.pop_back();
+    return ok;
+}
+bool is_polygon_convex(vector<point > &p) {
+    bool ok = true;
+    int sign = counter_clockwise(p[0], p[1], p[2]);
+    p.push_back(p[0]);
+    p.push_back(p[1]);
+
+    for (int i = 1; i < (int) p.size() - 2; i++) {
+        if (counter_clockwise(p[i], p[i + 1], p[i + 2]) != sign)
+            ok = false;
+    }
+
+    p.pop_back();
+    p.pop_back();
+    return ok;
+}
+double polygon_area(vector<point > &p) {
+    double area = 0;
+    p.push_back(p[0]);
+    for (int i = 0; i < (int) p.size() - 1; i++)
+        area += cross(p[i], p[i + 1]);
+    p.pop_back();
+    return fabs(area / 2.0);
+}
+point centroid(vector<point > &p) {
+    p.push_back(p[0]);
+
+    double area = 0, x = 0, y = 0;
+    for (int i = 0; i < (int) p.size() - 1; i++) {
+        double c = cross(p[i], p[i + 1]);
+        area += c;
+        x += (p[i].X + p[i + 1].X) * c;
+        y += (p[i].Y + p[i + 1].Y) * c;
+    }
+    p.pop_back();
+    area /= 2, x /= 6 * area, y /= 6 * area;
+
+    if (area == 0)
+        return (p[0] + p.back()) * (double) 0.5;
+
+    if (dcmp(x, 0) == 0)
+        x = 0;
+    if (dcmp(y, 0) == 0)
+        y = 0;
+
+    return point(x, y);
+}
+pair<vector<point >, vector<point > > polygon_cut(vector<point > &p, point a, point b) {
+    p.push_back(p[0]);
+    vector<point > left, right;
+
+    for (int i = 0; i < (int) p.size(); i++) {
+        if (dcmp(cross(b - a, p[i] - a), 0) >= 0)
+            right.push_back(p[i]);
+
+        if (are_segments_intersect(a, b, p[i], p[i + 1])) {
+            point j = lines_intersect(a, b, p[i], p[i + 1]);
+            right.push_back(j);
+            left.push_back(j);
+        }
+
+        if (dcmp(cross(b - a, p[i] - a), 0) <= 0)
+            left.push_back(p[i]);
+    }
+    return {left, right};
+}
+
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
-
-    complex<double> num1(2, 3);
-    cout << num1 << "\n"; // (2,3)
-    cout << num1.real() << " " << num1.imag() << "\n"; // 2 3
-
-    complex<double> num2(1, 1);
-    cout << "Abs: " << abs(num2) << "\n";
-    cout << "Arg(rad): " << arg(num2) << "\n";
-    cout << "Arg(rad): " << to_degree(arg(num2)) << "\n";
-    cout << "Norm: " << norm(num2) << "\n----------\n";
-
-    complex<double> num3 = polar(1.41421, 0.785398);
-    cout << num3 << "\n----------\n";
-
-    complex<double> zero;
-    // complex<double> x_part = 10; does not work?!
-
-    complex<double> a(1, 2), b(3, 4);
-    cout << a << " + " << b << " = " << a + b << "\n";
-    cout << a << " - " << b << " = " << a - b << "\n";
-    cout << a << " * " << b << " = " << a * b << "\n";
-    cout << a << " * " << 2.0 << " = " << a * 2.0 << "\n";
-    cout << a << " / " << 2.0 << " = " << a / 2.0 << "\n----------\n";
-
-    complex<double> i(0, 1);
-    complex<double> i1(-1, 0);
-    complex<double> i2(2, 3);
-    cout << sqrt(i1) << "\n";
-    cout << conj(i2) << "\n";
-    cout << pow(i2, 2) << "\n";
-    cout << exp(i * pi) << "\n----------\n";
-
-    point A(2, 1);
-    point B(6, 2);
-    point C(4, 3); // (8, 3)
-    point D(5, -2);
-    cout << lines_intersect(A, B, C, D) << "\n----------\n";
-    cout << are_segments_intersect(A, B, C, D) << "\n----------\n";
-
-    point q(2, 0);
-    point w(0, 2);
-    point e(4, 4);
-    auto p = circle(q, w, e);
-    cout << p.first << ", " << p.second << "\n----------\n";
-
-    auto ret1 = circle_line_intersection(3, point(2, 1), point(2, 3), point(-2, -2));
-    auto ret2 = circle_line_intersection(3, point(0, 0), point(-4.24264068712, 0), point(0, 4.24264068712));
-    auto ret3 = circle_line_intersection(3, point(0, 0), point(-4, 0), point(0, 8));
-    for (auto i : ret1)
-        cout << i << "\n";
-    cout << "-\n";
-    for (auto i : ret2)
-        cout << i << "\n";
-    cout << "-\n";
-    for (auto i : ret3)
-        cout << i << "\n";
-    cout << "----------\n";
 
     return 0;
 }
