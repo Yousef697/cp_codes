@@ -345,166 +345,80 @@ double closest_pair(vector<point>& p, pair<int, int>& ret) {
     return ans;
 }
 
-// My Intersecting-Segments Implementation (it gives runtime error idk why)
+// Intersecting Segments
 struct segment {
-    int id;
     point p, q;
+    int id;
 
     segment() {}
+
     segment(point p, point q, int id) : p(p), q(q), id(id) {}
 
-    double y(double x) const {
+    double get_y(double x) const {
         if (dcmp(p.X, q.X) == 0)
             return p.Y;
         return p.Y + (q.Y - p.Y) * (x - p.X) / (q.X - p.X);
     }
 };
-bool operator < (const segment& seg1, const  segment& seg2) {
-    double x = max(min(seg1.p.X, seg1.q.X), min(seg2.p.X, seg2.q.X));
-    return dcmp(seg1.y(x), seg2.y(x)) < 0;
+bool operator<(const segment &a, const segment &b) {
+    double x = max(min(a.p.X, a.q.X), min(b.p.X, b.q.X));
+    return dcmp(a.get_y(x), b.get_y(x)) == -1;
 }
 struct event {
     double x;
     int tp, id;
 
     event() {}
+
     event(double x, int tp, int id) : x(x), tp(tp), id(id) {}
 
-    bool operator < (const event& e) const {
+    bool operator<(const event &e) const {
         if (dcmp(x, e.x) != 0)
-            return dcmp(x, e.x) < 0;
-        return tp > e.tp;
-    }
-};
-set<segment> s;
-vector<set<segment>::iterator> where;
-set<segment>::iterator previous(set<segment>::iterator it) { return it == s.begin() ? s.end() : --it; }
-set<segment>::iterator next(set<segment>::iterator it) { return ++it; }
-bool intersect_1d(double l1, double r1, double l2, double r2) {
-    if (dcmp(l1, r1) == 1)
-        swap(l1, r1);
-    if (dcmp(l2, r2) == 1)
-        swap(l2, r2);
-    return dcmp(max(l1, l2), min(r1, r2)) <= 0;
-}
-bool intersect(segment seg1, segment seg2) {
-    return  intersect_1d(seg1.p.X, seg1.q.X, seg2.p.X, seg2.q.X) &&
-            intersect_1d(seg1.p.Y, seg1.q.Y, seg2.p.Y, seg2.q.Y) &&
-            orient(seg1.p, seg1.q, seg2.p) * orient(seg1.p, seg1.q, seg2.q) <= 0 &&
-            orient(seg2.p, seg2.q, seg1.p) * orient(seg2.p, seg2.q, seg1.q) <= 0;
-}
-pair<int, int> intersecting_segments(vector<segment>& segments) {
-    int n = (int)segments.size();
-    vector<event> events;
-
-    for (int i = 0; i < n; i++) {
-        events.push_back(event(min(segments[i].p.X, segments[i].q.X), +1, i));
-        events.push_back(event(max(segments[i].p.X, segments[i].q.X), -1, i));
-    }
-    sort(events.begin(), events.end());
-
-    s.clear();
-    where.resize(n);
-
-    for (int i = 0; i < events.size(); i++) {
-        int id = events[i].id;
-        if (events[i].tp == 1) {
-            auto nxt = s.lower_bound(segments[id]), prv = previous(nxt);
-            if (nxt != s.end() && intersect(*nxt, segments[id]))
-                return {nxt->id, id};
-            if (prv != s.end() && intersect(*prv, segments[id]))
-                return {prv->id, id};
-            where[id] = s.insert(nxt, segments[id]);
-        }
-        else {
-            auto nxt = next(where[id]), prv = previous(where[id]);
-            if (nxt != s.end() && prv != s.end() && intersect(*prv, *nxt))
-                return {prv->id, nxt->id};
-            s.erase(where[id]);
-        }
-    }
-    return {-1, -1};
-}
-
-// cp-algorithms Implementation (it gives accepted somehow)
-struct pt {
-    double x, y;
-    pt() {}
-    pt(double x, double y) : x(x), y(y) {}
-};
-struct segment {
-    pt p, q;
-    int id;
-
-    segment() {}
-    segment(pt p, pt q, int id) : p(p), q(q), id(id) {}
-
-    double get_y(double x) const {
-        if (abs(p.x - q.x) < EPS)
-            return p.y;
-        return p.y + (q.y - p.y) * (x - p.x) / (q.x - p.x);
-    }
-};
-bool operator<(const segment& a, const segment& b)
-{
-    double x = max(min(a.p.x, a.q.x), min(b.p.x, b.q.x));
-    return a.get_y(x) < b.get_y(x) - EPS;
-}
-struct event {
-    double x;
-    int tp, id;
-
-    event() {}
-    event(double x, int tp, int id) : x(x), tp(tp), id(id) {}
-
-    bool operator<(const event& e) const {
-        if (abs(x - e.x) > EPS)
             return x < e.x;
         return tp > e.tp;
     }
 };
-int vec(const pt& a, const pt& b, const pt& c) {
-    double s = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-    return abs(s) < EPS ? 0 : s > 0 ? +1 : -1;
-}
-bool intersect_1d(double l1, double r1, double l2, double r2) {
+
+bool intersect1d(double l1, double r1, double l2, double r2) {
     if (l1 > r1)
         swap(l1, r1);
     if (l2 > r2)
         swap(l2, r2);
-    return max(l1, l2) <= min(r1, r2) + EPS;
+    return dcmp(max(l1, l2), min(r1, r2)) <= 0;
 }
-bool intersect(const segment& a, const segment& b)
-{
-    return intersect_1d(a.p.x, a.q.x, b.p.x, b.q.x) &&
-           intersect_1d(a.p.y, a.q.y, b.p.y, b.q.y) &&
-           vec(a.p, a.q, b.p) * vec(a.p, a.q, b.q) <= 0 &&
-           vec(b.p, b.q, a.p) * vec(b.p, b.q, a.q) <= 0;
+bool intersect(const segment &a, const segment &b) {
+    return intersect1d(a.p.X, a.q.X, b.p.X, b.q.X) &&
+           intersect1d(a.p.Y, a.q.Y, b.p.Y, b.q.Y) &&
+           orient(a.p, a.q, b.p) * orient(a.p, a.q, b.q) <= 0 &&
+           orient(b.p, b.q, a.p) * orient(b.p, b.q, a.q) <= 0;
 }
+
 set<segment> s;
 vector<set<segment>::iterator> where;
 set<segment>::iterator prev(set<segment>::iterator it) { return it == s.begin() ? s.end() : --it; }
 set<segment>::iterator next(set<segment>::iterator it) { return ++it; }
-pair<int, int> solve(const vector<segment>& a) {
-    int n = (int)a.size();
+
+pair<int, int> solve(const vector<segment> &segments) {
+    int n = (int) segments.size();
     vector<event> e;
     for (int i = 0; i < n; ++i) {
-        e.push_back(event(min(a[i].p.x, a[i].q.x), +1, i));
-        e.push_back(event(max(a[i].p.x, a[i].q.x), -1, i));
+        e.push_back(event(min(segments[i].p.X, segments[i].q.X), +1, i));
+        e.push_back(event(max(segments[i].p.X, segments[i].q.X), -1, i));
     }
     sort(e.begin(), e.end());
 
     s.clear();
-    where.resize(a.size());
+    where.resize(segments.size());
+
     for (size_t i = 0; i < e.size(); ++i) {
         int id = e[i].id;
         if (e[i].tp == +1) {
-            set<segment>::iterator nxt = s.lower_bound(a[id]), prv = prev(nxt);
-            if (nxt != s.end() && intersect(*nxt, a[id]))
+            set<segment>::iterator nxt = s.lower_bound(segments[id]), prv = prev(nxt);
+            if (nxt != s.end() && intersect(*nxt, segments[id]))
                 return make_pair(nxt->id, id);
-            if (prv != s.end() && intersect(*prv, a[id]))
+            if (prv != s.end() && intersect(*prv, segments[id]))
                 return make_pair(prv->id, id);
-            where[id] = s.insert(nxt, a[id]);
+            where[id] = s.insert(nxt, segments[id]);
         } else {
             set<segment>::iterator nxt = next(where[id]), prv = prev(where[id]);
             if (nxt != s.end() && prv != s.end() && intersect(*nxt, *prv))
