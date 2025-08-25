@@ -89,7 +89,7 @@ bool is_point_on_ray(point a, point b, point c) // is point c on ray ab
 {
     if (!is_collinear(a, b, c))
         return false;
-    return dcmp(dot(b - a, c - a), 0) == 1;
+    return dcmp(dot(b - a, c - a), 0) >= 0;
 
     // if (length(a - c) == 0)
     //     return true;
@@ -114,17 +114,6 @@ double distance_to_segment(point a, point b, point c) // distance between point 
     if (dcmp(dot(a - b, c - b), 0) == -1)
         return length(c - b);
     return distance_to_line(a, b, c);
-}
-point lines_intersect(point a, point b, point c, point d) {
-    double d1 = cross(a - b, d - c);
-    double d2 = cross(a - c, d - c);
-    double d3 = cross(a - b, a - c);
-
-    if (fabs(d1) < eps)
-        return point(INT_MIN, INT_MIN);
-
-    double t1 = d2 / d1;
-    return a + (b - a) * t1;
 }
 bool in_circle(point a, point b, point p) { return dcmp(dot(a - p, b - p), 0) <= 0; } // is point p inside the circle with diameter ab
 bool point_on_segment(point a, point b, point p) { return orient(a, b, p) == 0 && in_circle(a, b, p); } // is point p on segment ab
@@ -218,7 +207,8 @@ pair<double, point > circle(point a, point b, point c) {
     point v1 = b - a, v2 = c - a;
     point p1(-v1.Y, v1.X), p2(-v2.Y, v2.X);
     point end1 = m1 + p1, end2 = m2 + p2;
-    point center = lines_intersect(m1, end1, m2, end2);
+    point center;
+    bool ok = intersect(line(m1, end1), line(m2, end2), center);
     return {length(a - center), center};
 }
 int circle_line_intersection(point center, double r, line l, pair<point, point>& ret) { // calc point of intersection of a circle and a line
@@ -265,7 +255,7 @@ int circles_tangents(point cen1, double r1, point cen2, double r2, bool inner, v
     return 1 + dcmp(h2, 0);
 }
 
-double triangle_area(point a, point b, point c) { return cross(b - a, c - a) / 2; } // calc area of triangle abc
+double triangle_area(point a, point b, point c) { return abs(cross(b - a, c - a)) / 2; } // calc area of triangle abc
 double polygon_area(vector<point>& p) { // calc area of a polygon
     int n = p.size();
     double area = 0;
@@ -275,11 +265,11 @@ double polygon_area(vector<point>& p) { // calc area of a polygon
     }
     return abs(area) / 2;
 }
-bool above(point a, point p) { return dcmp(p.Y, a.Y) >= 0; } // is point p in the above half of a
+bool above(point a, point p) { return dcmp(p.Y, a.Y) >= 0; } // is point p in the above half plane of a
 bool ray_cross(point a, point p, point q) { // does segment pq crosses the + horizontal ray of a
     return ((int)above(a, q) - (int)above(a, p)) * orient(a, p, q) > 0;
 }
-bool point_in_polygon(vector<point>& p, point a, bool strict = true) { // is point inside a polygon
+bool point_in_polygon(vector<point>& p, point a, bool strict = true) { // is point inside a polygon O(n)
     int n = p.size(), crosses = 0;
     for (int i = 0; i < n; i++) {
         int j = (i + 1) % n;
@@ -365,7 +355,8 @@ pair<vector<point >, vector<point > > polygon_cut(vector<point > &p, point a, po
 
         auto ret = improper_segments_intersection(a, b, p[i], p[i + 1]);
         if (ret.size()) {
-            point j = lines_intersect(a, b, p[i], p[i + 1]);
+            point j;
+            bool ok = intersect(line(a, b), line(p[i], p[i + 1]), j);
             right.push_back(j);
             left.push_back(j);
         }
@@ -728,8 +719,8 @@ int rectangles_union(const vector<array<int, 4>>& recs) {
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
-    
-    
-    
+
+
+
     return 0;
 }
