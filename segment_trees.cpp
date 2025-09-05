@@ -34,7 +34,7 @@ struct Segment_Tree {
 
     void update(int pos, int val) {
         pos += size - 1;
-        seg[pos] = merge(seg[pos], val);
+        seg[pos] = val;
         for (pos >>= 1; pos; pos >>= 1)
             seg[pos] = merge(seg[2 * pos], seg[2 * pos + 1]);
     }
