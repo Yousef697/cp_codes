@@ -6,12 +6,7 @@ using namespace std;
 long long mod = 1e9 + 7;
 typedef vector<int> row;
 typedef vector<row> Matrix;
-vector<Matrix> powers(64);
 
-/// @brief Multiply two matrices a, and b
-/// @param a
-/// @param b
-/// @return result of multiplication
 Matrix multiply(Matrix &a, Matrix &b) {
     int n = a.size(), m = b[0].size();
     Matrix ret(n, row(m, 0));
@@ -21,33 +16,27 @@ Matrix multiply(Matrix &a, Matrix &b) {
             if (a[i][k] == 0)
                 continue;
 
-            for (int j = 0; j < m; j++)
-                ret[i][j] = (ret[i][j] + a[i][k] * b[k][j] % mod) % mod;
+            for (int j = 0; j < m; j++) {
+                ret[i][j] = (ret[i][j] + a[i][k] * b[k][j] % mod);
+                if (ret[i][j] >= mod)
+                    ret[i][j] -= mod;
+            }
         }
     }
     return ret;
 }
 
-/// @brief initialize all powers of a matrix
-/// @param ret
-void init(Matrix &ret) {
-    powers[0] = ret;
-    for (int i = 1; i < 64; i++)
-        powers[i] = multiply(powers[i - 1], powers[i - 1]);
-}
-
-/// @brief raise a matrix to a power p
-/// @param p
-/// @return result of power
-Matrix get_power(int p) {
-    int n = powers[0].size();
+Matrix get_power(Matrix& a, int p) {
+    int n = a.size();
     Matrix ret(n, row(n, 0));
     for (int i = 0; i < n; i++)
         ret[i][i] = 1;
 
-    for (int i = 0; i < 64; i++) {
-        if ((p >> i) & 1)
-            ret = multiply(ret, powers[i]);
+    while (p) {
+        if (p & 1)
+            ret = multiply(ret, a);
+        a = multiply(a, a);
+        p >>= 1;
     }
 
     return ret;
