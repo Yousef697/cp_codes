@@ -672,11 +672,12 @@ struct SuffixAutomaton {
 
 // ==========================================================================================
 
-const int K = 26;
+const int K = 128, BASE = 'A';
 struct vertex {
     char ch;
     bool leaf = false;
     int next[K], parent, fail, exit, id;
+    vector<int> ids;
 
     vertex(int _p = -1, char _ch = '$') {
         ch = _ch;
@@ -694,33 +695,18 @@ struct aho_corasick {
     void insert(const string &s, int id = 0) {
         int u = 0;
         for (auto &c: s) {
-            int v = c - 'a';
+            int v = c - BASE;
             if (tree[u].next[v] == -1) {
                 tree[u].next[v] = tree.size();
                 tree.emplace_back(u, c);
             }
             u = tree[u].next[v];
         }
-        tree[u].id = id;
+        // tree[u].id = id;
+        tree[u].ids.emplace_back(id);
         tree[u].leaf = true;
     }
-    void dfs(int u) {
-        in[u] = ++time;
-        for (int i = 0; i < K; i++) {
-            if (tree[u].next[i] != -1) {
-                dfs(tree[u].next[i]);
-            }
-        }
-        out[u] = time;
-    }
-    bool is_ancestor(int u, int v) {
-        return in[u] <= in[v] && out[v] <= out[u];
-    }
     void build_aho() {
-        in.resize(tree.size());
-        out.resize(tree.size());
-        dfs(0);
-
         queue<int> q;
         q.push(0);
 
@@ -728,7 +714,7 @@ struct aho_corasick {
             if (u == 0 || tree[u].parent == 0)
                 return 0;
 
-            int x = tree[u].ch - 'a';
+            int x = tree[u].ch - BASE;
             while (u) {
                 int p = tree[u].parent;
                 int f = tree[p].fail;
@@ -796,7 +782,7 @@ struct aho_corasick {
     int next(int u, int c) { return tree[u].next[c]; }
     vertex operator[](int u) { return tree[u]; }
 };
-long long find_strings(const vector<string>& pats, const string& s) {
+long long find_strings(const vector<string>& pats, const string& s, vector<bool>& res) {
     // vector<string> words = {
     //     "abba", "baab", "aba", "aabb"
     // };
@@ -805,16 +791,17 @@ long long find_strings(const vector<string>& pats, const string& s) {
 
     int cnt = 0;
     aho_corasick aho;
-    for (auto& p: pats) {
+    vector<bool> vis(pats.size(), false);
+
+    for (auto& p: pats)
         aho.insert(p, cnt++);
-    }
     aho.build_aho();
 
     int u = 0, ind = -1;
     vector<array<int, 3>> ret; // which string, which index, which node
     for (auto& c : s) {
         ind++;
-        int x = c - 'a';
+        int x = c - BASE;
         if (aho.tree[u].next[x] != -1) {
             u = aho.next(u, x);
         }
@@ -830,17 +817,24 @@ long long find_strings(const vector<string>& pats, const string& s) {
             }
         }
 
-        if (aho[u].leaf)
+        if (aho[u].leaf) {
             ret.push_back({aho[u].id, ind, u});
+            for (auto l : aho[u].ids) {
+                vis[l] = true;
+            }
+        }
         int v = aho[u].exit;
         while (v) {
             ret.push_back({aho[v].id, ind, v});
+            for (auto l : aho[v].ids) {
+                vis[l] = true;
+            }
             v = aho[v].exit;
         }
     }
+    res = vis;
     return ret.size();
 }
-
 
 int32_t main() {
     ios::sync_with_stdio(false);
