@@ -592,6 +592,113 @@ pair<int, int> lcs(string& s, string& t) {
 
 // ==========================================================================================
 
+const int K = 26;
+struct vertex {
+    char ch;
+    bool leaf = false;
+    int next[K], parent, fail, cnt;
+
+    vertex(int _p = -1, char _ch = '$') : parent(_p), ch(_ch) {
+        fail = cnt = 0;
+        memset(next, -1, sizeof next);
+    }
+};
+struct aho_corasick {
+    int time = -1;
+    vector<vertex> tree;
+    vector<int> in, out;
+    aho_corasick() { tree.emplace_back(); }
+
+    void insert(const string &s, int idx) {
+        int u = 0;
+        for (auto &c: s) {
+            int v = c - 'a';
+            if (tree[u].next[v] == -1) {
+                tree[u].next[v] = tree.size();
+                tree.emplace_back(u, c);
+            }
+            u = tree[u].next[v];
+        }
+        tree[u].cnt++;
+        tree[u].leaf = true;
+    }
+    void dfs(int u) {
+        in[u] = ++time;
+        for (int i = 0; i < K; i++) {
+            if (tree[u].next[i] != -1) {
+                dfs(tree[u].next[i]);
+            }
+        }
+        out[u] = time;
+    }
+    bool is_ancestor(int u, int v) {
+        return in[u] <= in[v] && out[v] <= out[u];
+    }
+    void build_aho() {
+        in.resize(tree.size());
+        out.resize(tree.size());
+        dfs(0);
+
+        queue<int> q;
+        q.push(0);
+
+        auto compute_failure = [&](int u) -> int {
+            if (u == 0 || tree[u].parent == 0)
+                return 0;
+
+            int x = tree[u].ch - 'a';
+            while (u) {
+                int p = tree[u].parent;
+                int f = tree[p].fail;
+                if (tree[f].next[x] != -1) {
+                    return tree[f].next[x];
+                }
+                u = f;
+            }
+            if (tree[u].next[x] != -1)
+                return tree[u].next[x];
+            return u;
+        };
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            tree[u].fail = compute_failure(u);
+            if (~tree[u].parent)
+                tree[u].cnt += tree[ tree[u].parent ].cnt;
+            for (int i = 0; i < K; i++) {
+                if (tree[u].next[i] != -1) {
+                    q.push(tree[u].next[i]);
+                }
+            }
+        }
+    }
+    void print() {
+        // tree
+        for (int i = 0; i < tree.size(); i++) {
+            for (int j = 0; j < K; j++) {
+                if (tree[i].next[j] != -1) {
+                    cout << i << " ";
+                    cout << tree[i].next[j] << " ";
+                    cout << char(j + 'a') << "\n";
+
+                }
+            }
+        }
+        // failure
+        for (int i = 0; i < tree.size(); i++) {
+            cout << i << " ";
+            cout << tree[i].fail << "\n";
+        }
+    }
+
+    int fail(int u) { return tree[u].fail; }    
+    int next(int u, char c) { return tree[u].next[c]; }
+    vertex operator[](int u) { return tree[u]; }
+};
+
+// ==========================================================================================
+
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
