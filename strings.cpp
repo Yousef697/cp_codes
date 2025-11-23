@@ -672,6 +672,7 @@ struct SuffixAutomaton {
 
 // ==========================================================================================
 
+// My Code (Have issues)
 const int K = 128, BASE = 'A';
 struct vertex {
     char ch;
@@ -835,6 +836,62 @@ long long find_strings(const vector<string>& pats, const string& s, vector<bool>
     res = vis;
     return ret.size();
 }
+
+// Clean Code
+struct aho_corasick {
+    int n;
+    const int K = 10, BASE = '0';
+    vector<int> fail, exit;
+    vector<vector<int>> next, out;
+
+    aho_corasick(): n (0) { add_node(); }
+
+    int add_node() {
+        fail.emplace_back(0);
+        exit.emplace_back(0);
+        out.emplace_back();
+        next.emplace_back(K, 0);
+        return n++;
+    }
+    int get_idx(char c) { return c - BASE; }
+    void insert(const string& s, int idx) {
+        int u = 0;
+        for (char c: s) {
+            if (!next[u][get_idx(c)]) {
+                next[u][get_idx(c)] = add_node();
+            }
+            u = next[u][get_idx(c)];
+        }
+        out[u].emplace_back(idx);
+    }
+    void build() {
+        queue<int> q;
+        q.push(0);
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+
+            for (int i = 0; i < K; i++) {
+                int v = next[u][i];
+                if (!v) {
+                    next[u][i] = next[fail[u]][i];
+                }
+                else {
+                    fail[v] = u ? next[fail[u]][i] : 0;
+                    exit[v] = out[fail[v]].empty() ? exit[fail[v]] : fail[v];
+                    q.push(v);
+                }
+            }
+        }
+    }
+    int advance(int u, char c) {
+        while (u && !next[u][get_idx(c)])
+            u = fail[u];
+        u = next[u][get_idx(c)];
+        return u;
+    }
+};
 
 int32_t main() {
     ios::sync_with_stdio(false);
