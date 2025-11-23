@@ -837,7 +837,7 @@ long long find_strings(const vector<string>& pats, const string& s, vector<bool>
     return ret.size();
 }
 
-// Clean Code
+// Clean Code (Yassin Code)
 struct aho_corasick {
     int n;
     const int K = 10, BASE = '0';
