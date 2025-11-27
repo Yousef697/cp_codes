@@ -3,30 +3,82 @@
 using namespace std;
 using ll = long long;
 
-struct basis {
-    int n = 0;
-    vector<ll> base;
+const int K = 60, N = 505;
 
-    basis() {}
-    basis(const vector<ll>& v) {
-        for (auto i : v) {
-            add(i);
-        }
+struct xor_basis {
+    int sz;
+    ll basis[K];
+    bitset<N> index[K];
+
+    xor_basis(): sz(0) {
+        for (auto& i : index)
+            i.reset();
+        memset(basis, 0, sizeof basis);
     }
 
-    void add(ll x) {
-        ll a = x;
-        for (auto j : base) {
-            a = min(a, a ^ j);
-        }
-        if (a) {
-            n++;
-            base.push_back(a);
+    void insert(ll mask, int idx) {
+        bitset<N> cur; cur[idx] = 1;
+        for (int i = K - 1; i >= 0; i--) {
+            if (!(mask >> i & 1))
+                continue;
+            if (!basis[i]) {
+                basis[i] = mask, sz++;
+                index[i] = cur;
+                return;
+            }
+            mask ^= basis[i];
+            cur ^= index[i];
         }
     }
-    bool can(ll x) {
-        for (auto i : base)
-            x = min(x, x ^ i);
+    bool check(ll mask) {
+        for (int i = K - 1; i >= 0; i--) {
+            if (!(mask >> i & 1))
+                continue;
+            if (!basis[i]) {
+                return false;
+            }
+            mask ^= basis[i];
+        }
+        return true;
+    }
+    ll calc_xors() {
+        return (1ll << sz);
+    }
+    ll max() {
+        ll ans = 0;
+        for (int i = K - 1; i >= 0; i--) {
+            if (!basis[i])continue;
+            if (ans >> i & 1)continue;
+            ans ^= basis[i];
+        }
+        return ans;
+    }
+    ll kth(ll k) {
+        ll tot = (1ll << sz), ans = 0;
+        for (int i = K - 1; i >= 0; i--) {
+            if (!basis[i])continue;
+
+            tot /= 2;
+            if (tot < k && !(ans >> i & 1))
+                ans ^= basis[i];
+            else if (tot >= k && (ans >> i & 1))
+                ans ^= basis[i];
+
+            if (k > tot)
+                k -= tot;
+        }
+        return ans;
+    }
+    bool construct(ll x, bitset<N>& ret) {
+        for (int i = K - 1; i >= 0; i--) {
+            if (!(x >> i & 1))
+                continue;
+            if (!basis[i])
+                return false;
+
+            x ^= basis[i];
+            ret ^= index[i];
+        }
         return x == 0;
     }
 };
@@ -35,15 +87,48 @@ int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
 
-    int n;
-    cin >> n;
+    int n = 0, q;
+    cin >> q;
 
-    vector<ll> a(n);
-    for (auto& i : a)
-        cin >> i;
+    xor_basis b;
 
-    basis b(a);
-    cout << (1ll << b.n) << "\n";
-    
+    while (q--) {
+        int t; ll x;
+        cin >> t;
+
+        if (t == 1) { // insert x
+            cin >> x;
+            b.insert(x, n++);
+        }
+        else if (t == 2) { // find x-th distinct xor
+            cin >> x;
+            cout << b.kth(x) << "\n";
+        }
+        else if (t == 3) { // calc number of ways to get x as xor
+            cin >> x;
+            if (!b.check(x)) {
+                cout << 0 << "\n";
+                continue;
+            }
+            ll ans = (1ll << (n - b.sz));
+            cout << ans << "\n";
+        }
+        else if (t == 4) { // calc max xor value
+            cout << b.max() << "\n";
+        }
+        else if (t == 5) { // construct a sub-sequence with xor = x
+            cin >> x;
+            bitset<N> ret; ret.reset();
+            bool ok = b.check(x);
+            if (!ok) {
+                cout << -1 << "\n";
+                continue;
+            }
+            for (int i = 0; i < n; i++)
+                cout << ret[i];
+            cout << "\n";
+        }
+    }
+
     return 0;
 }
