@@ -4,13 +4,13 @@ using namespace std;
 using ll = long long;
 
 struct dfs_tree {
-    int n;
+    int n, is_connected;
     vector<int> in, out, dp, vis;
     vector<vector<int>> adj, tree;
     vector<pair<int, int>> bridges, back_edges, edges;
 
     dfs_tree(int _n) {
-        n = _n;
+        n = _n, is_connected = 1;
         in = out = dp = vis = vector<int>(n + 1, 0);
         tree = adj = vector<vector<int>>(n + 1);
     }
@@ -21,6 +21,8 @@ struct dfs_tree {
     }
     void work() {
         dfs(1, 0);
+        for (int i = 1; i <= n; i++)
+            if (!vis[i]) is_connected = 0;
         vis = vector<int>(n + 1);
         solve(1, 0);
     }
@@ -79,8 +81,8 @@ int32_t main() {
 
     tree.work();
 
-    if (!tree.bridges.empty()) {
-        cout << 0 << "\n";
+    if (!tree.bridges.empty() || !tree.is_connected) {
+        cout << "IMPOSSIBLE\n";
         return 0;
     }
 
@@ -88,6 +90,6 @@ int32_t main() {
         cout << u << " " << v << "\n";
     for (auto& [u, v] : tree.back_edges)
         cout << u << " " << v << "\n";
-    
+
     return 0;
 }
