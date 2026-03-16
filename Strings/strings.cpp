@@ -384,7 +384,7 @@ struct Trie {
 // ==========================================================================================
 
 // Manacher
-vector<int> manacher(const string &s) {
+pair<vector<int>, vector<int>> manacher(const string &s) {
     string t = "";
     for (const char &c: s)
         t += '#', t += c;
@@ -396,7 +396,7 @@ vector<int> manacher(const string &s) {
     vector<int> p(n + 2);
     for (int i = 1; i <= n; i++) {
         p[i] = min(r - i, p[l + (r - i)]);
-        p[i] = max(0ll, p[i]);
+        p[i] = max(0, p[i]);
 
         while (t[i - p[i]] == t[i + p[i]])
             p[i]++;
@@ -408,8 +408,16 @@ vector<int> manacher(const string &s) {
     for (int &i: p)
         i--;
 
-    // [even, odd]
-    return vector<int>(p.begin() + 1, p.end() - 1);
+    auto ret = vector<int>(p.begin() + 1, p.end() - 3);
+    vector<int> even, odd;
+    for (int i = 0; i + 1 < ret.size(); i += 2) {
+        even.push_back(ret[i]);
+        odd.push_back(ret[i + 1]);
+    }
+
+    // even[i] => if I consider indecies i-1 and i as the center, what is the maximum length of a palindrome substring?
+    // odd[i] => if I consider index i as the center, what is the maximum length of a palindrome substring?
+    return {even, odd};
 }
 
 // ==========================================================================================
