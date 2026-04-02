@@ -52,9 +52,7 @@ void ranges_union(vector<pair<int, int>>& ranges) {
 
     cur.emplace_back(ranges[0]);
     for (int i = 1; i < ranges.size(); i++) {
-        if (cur.back().first == ranges[i].first)
-            cur.back().second = ranges[i].second;
-        else if (cur.back().second < ranges[i].first)
+        if (cur.back().second < ranges[i].first)
             cur.push_back(ranges[i]);
         else
             cur.back().second = max(cur.back().second, ranges[i].second);
