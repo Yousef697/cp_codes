@@ -396,7 +396,7 @@ pair<vector<int>, vector<int>> manacher(const string &s) {
     vector<int> p(n + 2);
     for (int i = 1; i <= n; i++) {
         p[i] = min(r - i, p[l + (r - i)]);
-        p[i] = max(0, p[i]);
+        p[i] = max(0ll, p[i]);
 
         while (t[i - p[i]] == t[i + p[i]])
             p[i]++;
