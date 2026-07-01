@@ -24,7 +24,7 @@ int compress_vector(vector<int>& ranges) {
     for (auto& i : ranges) {
         i = lower_bound(c.begin(), c.end(), i) - c.begin();
     }
-    return c.back(); // max element if needed
+    return *max_element(ranges.begin(), ranges.end()); // max element if needed
 }
 
 // Compress Ranges

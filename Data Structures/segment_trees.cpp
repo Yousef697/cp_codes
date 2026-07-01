@@ -130,7 +130,7 @@ struct LazySegmentTree {
     }
     LazySegmentTree(const vector<int> &vec) {
         n = vec.size() - 1, neutral = 0;
-        seg = lazy = vector<int>(4 * size + 2, neutral);
+        seg = lazy = vector<int>(4 * n + 2, neutral);
         build(1, 1, n, vec);
     }
 
@@ -139,7 +139,7 @@ struct LazySegmentTree {
         if (lazy[i] == 0)
             return;
 
-        seg[n] += lazy[i];
+        seg[i] += lazy[i];
         if (l != r)
             lazy[2 * i] += lazy[i], lazy[2 * i + 1] += lazy[i];
         lazy[i] = 0;
