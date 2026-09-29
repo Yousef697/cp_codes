@@ -2,6 +2,7 @@
 #define int long long
 
 using namespace std;
+using ll = long long;
 
 // Iterative Segment Tree
 struct Segment_Tree {
@@ -403,6 +404,81 @@ struct MergeSortTree {
         return (a + b);
     }
 };
+
+// ==========================================================================================
+
+// Persistent Segment Tree
+struct Node {
+    Node *left, *right;
+    ll sum;
+
+    Node(ll sum = 0, Node* left = nullptr, Node* right = nullptr):
+        sum(sum), left(left), right(right) {}
+};
+Node* get_left(Node* cur) { return cur == nullptr ? cur : cur->left; }
+Node* get_right(Node* cur) { return cur == nullptr ? cur : cur->right; }
+ll get_value(Node* cur) { return cur == nullptr ? 0ll : cur->sum; }
+Node* make_leaf(ll sum) { return new Node(sum); }
+Node* merge(Node* left, Node* right) { return new Node(get_value(left) + get_value(right), left, right); }
+
+Node* update(Node* cur, int l, int r, int idx, int val) {
+    if (l == r) return make_leaf(val);
+    int mid = (l + r) / 2;
+    if (idx <= mid)
+        return merge(update(get_left(cur), l, mid, idx, val), get_right(cur));
+    return merge(get_left(cur), update(get_right(cur), mid + 1, r, idx, val));
+}
+ll query(Node* cur, int l, int r, int lq, int rq) {
+    if (r < lq || rq < l) return 0;
+    if (lq <= l && r <= rq) return get_value(cur);
+    int mid = (l + r) / 2;
+    return query(get_left(cur), l, mid, lq, rq) + query(get_right(cur), mid + 1, r, lq, rq);
+}
+
+// ==========================================================================================
+
+// Lazy Persistent Segment Tree
+struct Node {
+    int sum, lazy;
+    Node *left, *right;
+
+    Node(int sum = 0, int lazy = 0, Node *left = nullptr, Node *right = nullptr):
+        sum(sum), lazy(lazy), left(left), right(right) {}
+};
+Node *getL(Node *cur) { return cur == nullptr ? cur : cur->left; }
+Node *getR(Node *cur) { return cur == nullptr ? cur : cur->right; }
+int getS(Node *cur) { return cur == nullptr ? 0 : cur->sum; }
+int getLazy(Node *cur) { return cur == nullptr ? 0 : cur->lazy; }
+Node *make_leaf(int sum = 0) { return new Node(sum); }
+Node *merge(Node *left, Node *right) { return new Node(getS(left) + getS(right), 0, left, right); }
+Node *make_lazy(Node *cur, int l, int r, int val) { return new Node(getS(cur) + (r - l + 1) * val, getLazy(cur) + val, getL(cur), getR(cur)); }
+
+void propagate(Node *cur, int l, int r) {
+    if (getLazy(cur) == 0) return;
+    if (l != r) {
+        int mid = (l + r) / 2;
+        cur->left = make_lazy(cur->left, l, mid, cur->lazy);
+        cur->right = make_lazy(cur->right, mid + 1, r, cur->lazy);
+    }
+    cur->lazy = 0;
+}
+Node *update(Node *cur, int l, int r, int lq, int rq, int val) {
+    if (r < lq || rq < l) return cur;
+    if (lq <= l && r <= rq) return make_lazy(cur, l, r, val);
+    propagate(cur, l, r);
+    int mid = (l + r) / 2;
+    Node *left = update(getL(cur), l, mid, lq, rq, val);
+    Node *right = update(getR(cur), mid + 1, r, lq, rq, val);
+    return merge(left, right);
+}
+int query(Node *cur, int l, int r, int lq, int rq) {
+    if (r < lq || rq < l) return 0;
+    if (lq <= l && r <= rq) return getS(cur);
+    propagate(cur, l, r);
+    int mid = (l + r) / 2;
+    return query(getL(cur), l, mid, lq, rq) + query(getR(cur), mid + 1, r, lq, rq);
+}
+
 
 int32_t main() {
     ios::sync_with_stdio(false);
