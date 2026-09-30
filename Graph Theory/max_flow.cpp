@@ -5,6 +5,7 @@ using namespace std;
 using ll = long long;
 using ld = long double;
 
+// Ford-Fulkerson Edmond-Karp
 struct MaxFlow {
     const int inf = 1e9 + 9;
     int n;
@@ -121,6 +122,134 @@ struct MaxFlow {
         return flow;
     }
 };
+
+// ==========================================================================================
+
+// Push-Relabel Algorithm
+struct PushRelabel {
+    const int inf = 1e15;
+    int n;
+    queue<int> excess_vertices;
+    vector<pair<int, int>> cuts;
+    vector<int> excess, height, next_son;
+    vector<vector<int>> cap, flow, init, paths;
+
+    PushRelabel(int n): n(n) {
+        cap = flow = init = vector<vector<int>>(n + 1, vector<int>(n + 1));
+        excess = height = next_son = vector<int>(n + 1);
+    }
+
+    void add_edge(int u, int v, int c = 1) {
+        init[u][v] += c;
+    }
+    void relabel(int u) {
+        int d = inf;
+        for (int v = 1; v <= n; v++) {
+            if (cap[u][v] > flow[u][v])
+                d = min(d, height[v]);
+        }
+        if (d < inf)
+            height[u] = d + 1;
+    }
+    void push(int u, int v) {
+        int d = min(excess[u], cap[u][v] - flow[u][v]);
+        flow[u][v] += d;
+        flow[v][u] -= d;
+        excess[u] -= d;
+        excess[v] += d;
+        if (d && excess[v] == d)
+            excess_vertices.emplace(v);
+    }
+    void discharge(int u) {
+        while (excess[u] > 0) {
+            if (next_son[u] <= n) {
+                int v = next_son[u];
+                if (cap[u][v] > flow[u][v] && height[u] > height[v]) {
+                    push(u, v);
+                }
+                else {
+                    next_son[u]++;
+                }
+            }
+            else {
+                relabel(u);
+                next_son[u] = 1;
+            }
+        }
+    }
+    int max_flow(int s, int t) {
+        cap = init;
+        height[s] = n;
+        excess[s] = inf;
+
+        for (int i = 1; i <= n; i++) {
+            if (i != s)
+                push(s, i);
+        }
+        while (!excess_vertices.empty()) {
+            int u = excess_vertices.front();
+            excess_vertices.pop();
+            if (u != s && u != t) {
+                discharge(u);
+            }
+        }
+        int ans = 0;
+        for (int i = 1; i <= n; i++) {
+            ans += flow[i][t];
+        }
+        return ans;
+    }
+
+    int construct_paths(int s, int t) {
+        int ans = max_flow(s, t);
+        vector<int> cur = {s};
+        vector<vector<int>> vis(n + 1, vector<int>(n + 1));
+        function<void(int, int)> dfs = [&](int u, int p) {
+            vis[u][p] = 1;
+            if (u == t) {
+                cur.emplace_back(u);
+                paths.emplace_back(cur);
+                cur.pop_back();
+                return;
+            }
+            cur.emplace_back(u);
+            for (int v = 1; v <= n; v++) {
+                if (flow[u][v] > 0 && !vis[v][u]) {
+                    dfs(v, u);
+                    break;
+                }
+            }
+            cur.pop_back();
+        };
+        for (int i = 1; i <= n; i++) {
+            if (flow[s][i] > 0)
+                dfs(i, s);
+        }
+        return ans;
+    }
+    int min_cut(int s, int t) {
+        int ans = max_flow(s, t);
+        vector<int> vis(n + 1);
+        function<void(int, int)> dfs = [&](int u, int p) {
+            vis[u] = 1;
+            for (int v = 1; v <= n; v++) {
+                if (!vis[v] && cap[u][v] > flow[u][v])
+                    dfs(v, u);
+            }
+        };
+        dfs(s, 0);
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (init[i][j] && vis[i] && !vis[j]) {
+                    cuts.emplace_back(i, j);
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+// ==========================================================================================
 
 int32_t main() {
     ios::sync_with_stdio(false);
