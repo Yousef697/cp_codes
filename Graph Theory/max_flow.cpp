@@ -66,23 +66,6 @@ struct MaxFlow {
         return flow;
     }
 
-    void dfs_paths(int u, int p, int t) {
-        vis[u][p] = 1;
-        if (u == t) {
-            cur_path.emplace_back(u);
-            paths.emplace_back(cur_path);
-            cur_path.pop_back();
-            return;
-        }
-        cur_path.emplace_back(u);
-        for (auto &v: g[u]) {
-            if (v != p && !vis[v][u]) {
-                dfs_paths(v, u, t);
-                break;
-            }
-        }
-        cur_path.pop_back();
-    }
     int construct_paths(int s, int t) {
         int flow = max_flow(s, t);
         vis = vector<vector<int> >(n + 1, vector<int>(n + 1, 0));
@@ -95,23 +78,39 @@ struct MaxFlow {
         }
         paths.clear();
         cur_path = {s};
+        function<void(int, int)> dfs_paths = [&](int u, int p) {
+            vis[u][p] = 1;
+            if (u == t) {
+                cur_path.emplace_back(u);
+                paths.emplace_back(cur_path);
+                cur_path.pop_back();
+                return;
+            }
+            cur_path.emplace_back(u);
+            for (auto &v: g[u]) {
+                if (v != p && !vis[v][u]) {
+                    dfs_paths(v, u);
+                    break;
+                }
+            }
+            cur_path.pop_back();
+        };
         for (auto &v: g[s]) {
-            dfs_paths(v, 1, t);
+            dfs_paths(v, 1);
         }
         return flow;
-    }
-
-    void dfs_cuts(int u, int p) {
-        reach[u] = 1;
-        for (auto &v: adj[u]) {
-            if (v != p && !reach[v] && cap[u][v])
-                dfs_cuts(v, u);
-        }
     }
     int construct_min_cuts(int s, int t) {
         int flow = max_flow(s, t);
         reach = vector<int>(n + 1);
         cuts.clear();
+        function<void(int, int)> dfs_cuts = [&](int u, int p) {
+            reach[u] = 1;
+            for (auto &v: adj[u]) {
+                if (v != p && !reach[v] && cap[u][v])
+                    dfs_cuts(v, u);
+            }
+        };
         dfs_cuts(s, s);
         for (int i = 1; i <= n; i++) {
             for (auto &j: adj[i]) {
