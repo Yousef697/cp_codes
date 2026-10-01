@@ -251,6 +251,77 @@ struct PushRelabel {
 
 // ==========================================================================================
 
+// Hopcroft-Karp
+struct HopcroftKarp {
+    const int inf = 1e9 + 9;
+    int n, m;
+    vector<int> match, dist;
+    vector<vector<int>> adj;
+    vector<pair<int, int>> edges;
+
+    HopcroftKarp(int n, int m): n(n), m(m) {
+        match = dist = vector<int>(n + m + 1);
+        adj = vector<vector<int>>(n + m + 1);
+    }
+    void add_edge(int u, int v) {
+        v += n;
+        adj[u].emplace_back(v);
+        adj[v].emplace_back(u);
+    }
+    bool bfs() {
+        queue<int> q;
+        for (int i = 1; i <= n; i++) {
+            if (!match[i])
+                dist[i] = 0, q.emplace(i);
+            else
+                dist[i] = inf;
+        }
+        dist[0] = inf;
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            if (dist[u] >= dist[0]) continue;
+            for (auto& v : adj[u]) {
+                if (dist[match[v]] == inf) {
+                    dist[match[v]] = dist[u] + 1;
+                    q.emplace(match[v]);
+                }
+            }
+        }
+        return dist[0] != inf;
+    }
+    bool dfs(int u) {
+        if (u == 0) return true;
+        for (auto& v : adj[u]) {
+            if (dist[match[v]] == dist[u] + 1 && dfs(match[v])) {
+                match[u] = v;
+                match[v] = u;
+                return true;
+            }
+        }
+        dist[u] = inf;
+        return false;
+    }
+    int calc() {
+        int ans = 0;
+        while (bfs()) {
+            for (int i = 1; i <= n; i++) {
+                if (!match[i] && dfs(i)) {
+                    ans++;
+                }
+            }
+        }
+        for (int i = 1; i <= n; i++) {
+            if (match[i])
+                edges.emplace_back(i, match[i] - n);
+        }
+        return ans;
+    }
+};
+
+// ==========================================================================================
+
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
