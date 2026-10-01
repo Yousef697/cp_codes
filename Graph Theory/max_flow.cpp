@@ -321,6 +321,82 @@ struct HopcroftKarp {
 
 // ==========================================================================================
 
+// Dinic
+struct Dinic {
+    const int inf = 1e18 + 18;
+    struct Edge {
+        int u, v, cap, flow = 0;
+        Edge(int u, int v, int cap): u(u), v(v), cap(cap) {}
+    };
+
+    int n, m = 0;
+    vector<Edge> edges, init;
+    vector<vector<int>> adj;
+    vector<int> level, ptr;
+    queue<int> q;
+
+    Dinic(int n): n(n) {
+        adj = vector<vector<int>>(n + 1);
+        ptr = level = vector<int>(n + 1);
+    }
+
+    void add_edge(int u, int v, int cap) {
+        init.emplace_back(u, v, cap);
+        init.emplace_back(v, u, 0);
+        adj[u].emplace_back(m); m++;
+        adj[v].emplace_back(m); m++;
+    }
+    bool bfs(int s, int t) {
+        level = vector<int>(n + 1, -1);
+        level[s] = 0;
+        q.emplace(s);
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            for (auto& id : adj[u]) {
+                if (edges[id].cap == edges[id].flow) continue;
+                if (level[edges[id].v] != -1) continue;
+                level[edges[id].v] = level[u] + 1;
+                q.emplace(edges[id].v);
+            }
+        }
+        return level[t] != -1;
+    }
+    int dfs(int u, int pushed, int t) {
+        if (pushed == 0) return 0;
+        if (u == t) return pushed;
+        for (int& cid = ptr[u]; cid < adj[u].size(); cid++) {
+            int id = adj[u][cid];
+            int v = edges[id].v;
+            if (level[u] + 1 != level[v]) continue;
+            int new_pushed = min(pushed, edges[id].cap - edges[id].flow);
+            int add = dfs(v, new_pushed, t);
+            if (add == 0) continue;
+            edges[id].flow += add;
+            edges[id ^ 1].flow -= add;
+            return add;
+        }
+        return 0;
+    }
+    int max_flow(int s, int t) {
+        int ans = 0;
+        edges = init;
+
+        while (true) {
+            if (!bfs(s, t)) break;
+            ptr = vector<int>(n + 1, 0);
+            while (true) {
+                int pushed = dfs(s, inf, t);
+                if (!pushed) break;
+                ans += pushed;
+            }
+        }
+        return ans;
+    }
+};
+
+// ==========================================================================================
+
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
