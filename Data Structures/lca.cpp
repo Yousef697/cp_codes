@@ -4,76 +4,43 @@ using namespace std;
 
 // Lowest Common Ancestor (LCA)
 struct LCA {
-    /// @brief LCA Variable
-    int lg = log2(2e5 + 5), cnt = 1, n;
+    int n, root, lg, cnt;
     vector<int> open, close, level;
     vector<vector<int> > table, adj;
 
-    /// @brief Contructor
-    LCA(int root, vector<vector<int> > &a) {
-        n = a.size() - 1;
-        lg = log2(n);
+    LCA(int n, int root = 1): n(n), root(root) {
+        lg = log2(n), cnt = 0;
         open = close = level = vector<int>(n + 1, 0);
+        adj = vector<vector<int>> (n + 1);
         table = vector<vector<int> >(n + 1, vector<int>(lg + 1, root));
-        adj = a;
-
-        dfs(root, root);
     }
-
-    /// @brief do depth-first search on the tree to know if a node is an ancestor of another node
-    /// @param node
-    /// @param parent
-    void dfs(int node, int parent) {
-        open[node] = cnt++;
-
-        table[node][0] = parent;
-        for (int i = 1; i <= lg; i++) {
-            int x = table[node][i - 1];
-            table[node][i] = table[x][i - 1];
-        }
-
-        for (auto i: adj[node]) {
-            if (i != parent)
-                level[i] = level[node] + 1, dfs(i, node);
-        }
-
-        close[node] = cnt++;
+    void add_edge(int u, int v) {
+        adj[u].emplace_back(v);
+        adj[v].emplace_back(u);
     }
-
-    /// @brief check if a node "a" is an ancestor of node "b"
-    /// @param a
-    /// @param b
-    /// @return true if node "a" is an ancestor of node "b", false otherwise
-    bool is_ancestor(int a, int b) {
-        return open[a] <= open[b] && close[b] <= close[a];
+    void dfs(int u, int p) {
+        open[u] = ++cnt;
+        table[u][0] = p;
+        for (int i = 1; i <= lg; i++)
+            table[u][i] = table[table[u][i - 1]][i - 1];
+        for (auto& v: adj[u])
+            if (v != p)
+                level[v] = level[u] + 1, dfs(v, u);
+        close[u] = cnt;
     }
-
-    /// @brief get the least common ancestor of two nodes
-    /// @param a
-    /// @param b
-    /// @return LCA
-    int query(int a, int b) {
-        if (is_ancestor(a, b))
-            return a;
-        if (is_ancestor(b, a))
-            return b;
-
-        for (int i = lg; i >= 0; i--) {
-            if (!is_ancestor(table[a][i], b)) {
-                a = table[a][i];
-            }
-        }
-
-        return table[a][0];
+    bool is_ancestor(int u, int v) {
+        return open[u] <= open[v] && close[v] <= close[u];
     }
-
-    /// @brief get the distance between two nodes in a tree
-    /// @param a
-    /// @param b
-    /// @return distance between node "a", and "b"
+    int query(int u, int v) {
+        if (is_ancestor(u, v)) return u;
+        if (is_ancestor(v, u)) return v;
+        for (int i = lg; i >= 0; i--)
+            if (!is_ancestor(table[u][i], v))
+                u = table[u][i];
+        return table[u][0];
+    }
     int get_distance(int u, int v) {
-        int ancestor = query(u, v);
-        return abs(level[ancestor] - level[v]) + abs(level[ancestor] - level[u]);
+        return level[u] + level[v] - 2 * level[query(u, v)];
     }
 };
 
@@ -84,21 +51,17 @@ int32_t main() {
     int n, q;
     cin >> n >> q;
 
-    vector<vector<int> > adj(n + 1);
+    LCA lca(n, 1);
     for (int i = 1; i <= n - 1; i++) {
         int u, v;
         cin >> u >> v;
-
-        adj[u].push_back(v);
-        adj[v].push_back(u);
+        lca.add_edge(u, v);
     }
-
-    LCA lca(1, adj);
 
     while (q--) {
         int u, v;
         cin >> u >> v;
-
+        
         cout << lca.query(u, v) << "\n";
     }
 
