@@ -397,6 +397,76 @@ struct Dinic {
 
 // ==========================================================================================
 
+// Min-Cost Max-Flow
+struct MCMF {
+    struct edge {
+        int to, cap, cost, rev;
+    };
+    const int inf = 1e18;
+
+    int n;
+    vector<vector<edge>> adj;
+    vector<int> dist, parent_node, parent_edge;
+
+    MCMF(int n): n(n) {
+        adj = vector<vector<edge>>(n + 1);
+        dist = parent_node = parent_edge = vector<int>(n + 1);
+    }
+
+    void add_edge(int u, int v, int cap, int cost) {
+        adj[u].push_back({v, cap, cost, (int)adj[v].size()});
+        adj[v].push_back({u, 0, -cost, (int)adj[u].size() - 1});
+    }
+
+    pair<int, int> mcmf(int s, int t, int k = -1) {
+        if (k == -1) k = inf;
+        int flow = 0, cost = 0;
+        while (flow < k) {
+            fill(dist.begin(), dist.end(), inf);
+            priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+
+            dist[s] = 0;
+            pq.emplace(0, s);
+
+            while (!pq.empty()) {
+                auto [d, u] = pq.top();
+                pq.pop();
+                if (d > dist[u]) continue;
+
+                for (int i = 0; i < adj[u].size(); i++) {
+                    auto& e = adj[u][i];
+                    if (e.cap > 0 && dist[e.to] > d + e.cost) {
+                        dist[e.to] = d + e.cost;
+                        parent_node[e.to] = u;
+                        parent_edge[e.to] = i;
+                        pq.emplace(dist[e.to], e.to);
+                    }
+                }
+            }
+            if (dist[t] == inf) break;
+            int add = k - flow, cur = t;
+            while (cur != s) {
+                auto& e = adj[parent_node[cur]][parent_edge[cur]];
+                add = min(add, e.cap);
+                cur = parent_node[cur];
+            }
+            cur = t;
+            while (cur != s) {
+                auto& e = adj[parent_node[cur]][parent_edge[cur]];
+                e.cap -= add;
+                adj[cur][e.rev].cap += add;
+                cost += add * e.cost;
+                cur = parent_node[cur];
+            }
+            flow += add;
+        }
+
+        return {flow, cost};
+    }
+};
+
+// ==========================================================================================
+
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
