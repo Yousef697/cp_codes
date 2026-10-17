@@ -3,71 +3,59 @@
 using namespace std;
 using ll = long long;
 
-const int K = 2;
+const int K = 26;
 struct Trie {
-    vector<int> leaf;
-    vector<int> cnts;
-    vector<vector<int> > tree;
+    struct Node {
+        int cnt = 0;
+        vector<int> index;
+        array<int, K> next;
+    };
+    vector<Node> tree;
 
-    Trie() {
-        leaf.push_back(0);
-        cnts.push_back(0);
-        tree.push_back(vector<int>(K, 0));
-    }
+    Trie() { tree.emplace_back(); }
 
-    void insert(const string &s, int v = 0, int i = 0) {
-        if (i == s.size()) {
-            cnts[v]++;
-            leaf[v] = 1;
-            return;
+    int get(char ch) { return ch - 'a'; }
+    int advance(int v, char ch) { return tree[v].next[get(ch)]; }
+
+    void insert(const string &s, int idx = 0) {
+        int v = 0;
+        for (auto& ch : s) {
+            tree[v].cnt++;
+            if (!advance(v, ch)) {
+                tree[v].next[get(ch)] = tree.size();
+                tree.emplace_back();
+            }
+            v = advance(v, ch);
         }
-
-        if (!tree[v][s[i] - '0']) {
-
-            tree[v][s[i] - '0'] = tree.size();
-            leaf.push_back(0);
-            cnts.push_back(0);
-            tree.push_back(vector<int>(2, 0));
+        tree[v].cnt++;
+        tree[v].index.emplace_back(idx);
+    }
+    void erase(const string &s) {
+        int v = 0;
+        for (auto& ch : s) {
+            assert(advance(v, ch));
+            tree[v].cnt--;
+            v = advance(v, ch);
         }
-
-        int next = tree[v][s[i] - '0'];
-        insert(s, next, i + 1);
-        cnts[v]++;
+        tree[v].index.pop_back();
     }
-    void erase(const string &s, int v = 0, int i = 0) {
-        if (i == s.size()) {
-            cnts[v]--;
-            if (cnts[v] == 0)
-                leaf[v] = 0;
-            return;
+    int search_word(const string &s) {
+        int v = 0;
+        for (auto& ch : s) {
+            v = advance(v, ch);
+            if (!v) return 0;
         }
-
-        assert(tree[v][s[i] - '0']);
-        int next = tree[v][s[i] - '0'];
-        erase(s, next, i + 1);
-
-        cnts[v]--;
-        if (cnts[next] == 0)
-            tree[v][s[i] - '0'] = 0;
+        return tree[v].index.size();
     }
-    int serach_word(const string &s, int v = 0, int i = 0) {
-        if (i == s.size())
-            return leaf[v];
-
-        if (!tree[v][s[i] - '0'])
-            return -1;
-        return serach_word(s, tree[v][s[i] - '0'], i + 1);
-    }
-    int serach_prefix(const string &s, int v = 0, int i = 0) {
-        if (i == s.size())
-            return 1;
-
-        if (!tree[v][s[i] - '0'])
-            return -1;
-        return serach_prefix(s, tree[v][s[i] - '0'], i + 1);
+    int search_prefix(const string &s) {
+        int v = 0;
+        for (auto& ch : s) {
+            v = advance(v, ch);
+            if (!v) return 0;
+        }
+        return tree[v].cnt;
     }
 };
-
 
 int32_t main() {
     ios::sync_with_stdio(false);
