@@ -85,6 +85,69 @@ int cmp(const fraction& n, const fraction& m) {
 void println(const fraction& n) { cout << n.a << "/" << n.b << "\n"; }
 void print(fraction& n) { cout << n.a << "/" << n.b; }
 
+// Median
+struct Median {
+    long long sum_left = 0, sum_right = 0;
+    multiset<int> left, right;
+
+    void balance() {
+        while (left.size() > right.size() + 1) {
+            int val = *left.rbegin();
+            sum_left -= val;
+            sum_right += val;
+            right.emplace(val);
+            left.erase(left.find(val));
+        }
+        while (left.size() < right.size()) {
+            int val = *right.begin();
+            sum_left += val;
+            sum_right -= val;
+            left.emplace(val);
+            right.erase(right.find(val));
+        }
+    }
+
+    void insert(int val) {
+        if (left.empty() || *left.rbegin() >= val)
+            left.emplace(val), sum_left += val;
+        else
+            right.emplace(val), sum_right += val;
+        balance();
+    }
+
+    void erase(int val) {
+        if (val <= *left.rbegin()) {
+            auto it = left.find(val);
+            if (it != left.end())
+                left.erase(it), sum_left -= val;
+            else
+                assert(0);
+        }
+        else {
+            auto it = right.find(val);
+            if (it != right.end())
+                right.erase(it), sum_right -= val;
+            else
+                assert(0);
+        }
+        balance();
+    }
+
+    long long get_median() {
+        if (left.empty()) return 0;
+        return *left.rbegin();
+    }
+
+    long long min_ops() {
+        long long med = get_median();
+        long long ans = 0;
+        ans += 1ll * left.size() * med - sum_left;
+        ans += sum_right - 1ll * right.size() * med;
+        return ans;
+    }
+};
+
+
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
