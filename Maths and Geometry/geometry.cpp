@@ -716,6 +716,58 @@ int rectangles_union(const vector<array<int, 4>>& recs) {
     return ans;
 }
 
+// Kernel Polygon
+vector<point> clip_polygon(const vector<point>& p, point a, point b) {
+    int n = p.size();
+    vector<point> ret;
+    for (int i = 0; i < n; i++) {
+        int j = (i + 1) % n;
+        int oi = orient(a, b, p[i]);
+        int oj = orient(a, b, p[j]);
+
+        if (oi >= 0 && oj >= 0) {
+            ret.emplace_back(p[j]);
+        }
+        else if (oi >= 0 && oj < 0) {
+            double ci = cross(b - a, p[i] - a);
+            double cj = cross(b - a, p[j] - p[i]);
+            double t = -ci / cj;
+            ret.emplace_back(p[i] + t * (p[j] - p[i]));
+        }
+        else if (oi < 0 && oj >= 0) {
+            double ci = cross(b - a, p[i] - a);
+            double cj = cross(b - a, p[j] - p[i]);
+            double t = -ci / cj;
+            ret.emplace_back(p[i] + t * (p[j] - p[i]));
+            ret.emplace_back(p[j]);
+        }
+    }
+    return ret;
+}
+vector<point> kernel_polygon(const vector<point>& p) {
+    int n = p.size();
+    int min_x = INF, min_y = INF;
+    int max_x = -INF, max_y = -INF;
+
+    for (auto& i : p) {
+        max_x = max(max_x, (int)i.X);
+        max_y = max(max_y, (int)i.Y);
+        min_x = min(min_x, (int)i.X);
+        min_y = min(min_y, (int)i.Y);
+    }
+
+    vector<point> ker;
+    ker.emplace_back(min_x, min_y);
+    ker.emplace_back(max_x, min_y);
+    ker.emplace_back(max_x, max_y);
+    ker.emplace_back(min_x, max_y);
+
+    for (int i = 0; i < n; i++) {
+        ker = clip_polygon(ker, p[i], p[(i + 1) % n]);
+    }
+    return ker;
+}
+
 int32_t main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
