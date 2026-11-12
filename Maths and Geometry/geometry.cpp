@@ -716,7 +716,7 @@ int rectangles_union(const vector<array<int, 4>>& recs) {
     return ans;
 }
 
-// Kernel Polygon
+// Kernel Polygon (given is a simple counter clock-wise polygon)
 vector<point> clip_polygon(const vector<point>& p, point a, point b) {
     int n = p.size();
     vector<point> ret;
