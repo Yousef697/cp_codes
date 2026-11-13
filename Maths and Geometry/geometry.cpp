@@ -4,52 +4,43 @@
 
 using namespace std;
 
+// Constants
 const double eps = 1e-9;
 const double pi = acos(-1);
 const double rotation = 360.0;
 const double INF = 1e18;
 
+// Defines & Macros
 #define X real()
 #define Y imag()
 #define point complex<double>
-
 #define vec(a,b) ((b) - (a))
 #define length(a) (hypot((a).X, (a).Y))
 #define normalize(a) ((a)/length(a))
-
 #define dot(a,b) ((conj(a)*(b)).X)
 #define cross(a,b) ((conj(a)*(b)).Y)
 #define same(a,b) (dot(vec(a,b),vec(b,a)) < eps)
 #define square(a) (dot((a),(a)))
-
 #define rotate0(a,ang) ((a)*exp(point(0,ang)))
 #define rotate_about(a,ang,about) (rotate0(vec(about,a),ang)+about)
-
 #define reflect0(a,b) (conj((a)/(b))*(b))
 #define reflect_about(p, p0, p1) (reflect0(vec(p0, p), vec(p0, p1)) + p0)
+#define radians(degree) ((degree) / 180.0 * pi)
+#define degrees(radian) ((radian) / pi * 180.0)
+#define perp(p) (point(-p.Y, p.X))
 
-double to_radians(double degree) { return degree / 180.0 * pi; }
-double to_degree(double radian) { return radian / pi * 180.0; }
+// Double Compare
 int dcmp(double x, double y) { return (fabs(x - y) < eps) ? 0 : (x < y ? -1 : 1); }
 
-double angle(point a) { return (atan2((a).Y, (a).X)); }
+// Angles
+double angle(point a) { return atan2((a).Y, (a).X); }
 double angle(point v, point w) { return acos(min((double)1, max((double)-1, dot(v, w) / abs(v) / abs(w)))); } // angle between v, w
-point translate(point v, point p) { return v + p; } // translates v by p
-point scale(point v, double factor, point center = {0, 0}) { return center + (v - center) * factor; } // scales v by factor around center
-point linear_transformation(point p, point fp, point q, point fq, point r) { return fp + (r - p) * ((fq - fp) / (q - p)); } // p->fp, q->fq, r->?
-point perp(point p) { return point(-p.Y, p.X); }
-
-int orient(point a, point b, point c) { return dcmp(cross(b - a, c - a), 0); } // a->b->c to left or right
-bool in_angle(point a, point b, point c, point p) { // is point p inside the angle bac
+int orient(point a, point b, point c) { return dcmp(cross(b - a, c - a), 0); } // angle abc to left or right
+bool in_angle(point a, point b, point c, point p) { // is point p inside the angle abc
     assert(orient(a, b, c) != 0);
     if (orient(a, b, c) == -1)
-        swap(b, c);
-    return orient(a, b, p) >= 0 && orient(a, c, p) <= 0;
-}
-double oriented_angle(point a, point b, point c) { // angle bac
-    if (orient(a, b, c) >= 0)
-        return angle(b - a, c - a);
-    return 2 * pi - angle(b - a, c - a);
+        swap(a, c);
+    return orient(b, a, p) <= 0 && orient(b, c, p) >= 0;
 }
 
 struct line { // ax + by = c
